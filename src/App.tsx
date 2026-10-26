@@ -20,10 +20,11 @@ import {
 } from './utils/logoConfig';
 import { saveDraft, loadSavedDraft, clearSavedDraft } from './utils/storage';
 import { exportToPdf, exportToJpg, ExportProgress } from './utils/exportUtils';
+import { preloadFontEmbedCSS } from './utils/fontUtils';
 import { CoverPageRenderer } from './components/templates/CoverPageRenderer';
 
 export default function App() {
-  // Main form state
+  // main form state
   const [coverData, setCoverData] = useState<CoverPageData>(() => {
     const saved = loadSavedDraft();
     return saved.data || INITIAL_COVER_PAGE_DATA;
@@ -56,6 +57,11 @@ export default function App() {
     };
     window.addEventListener(LOGO_CHANGE_EVENT, handleLogoChange);
     return () => window.removeEventListener(LOGO_CHANGE_EVENT, handleLogoChange);
+  }, []);
+
+  // Preload web font binaries in background for instant, high-fidelity export
+  useEffect(() => {
+    preloadFontEmbedCSS();
   }, []);
 
   // Autosave draft (debounced by 800ms)
@@ -96,8 +102,14 @@ export default function App() {
     }
   };
 
+  const isExporting =
+    exportProgress !== null &&
+    ['preparing', 'rendering', 'saving'].includes(exportProgress.status);
+
   // Export handlers
   const handleExportPdf = async () => {
+    if (isExporting) return;
+
     const target = printTargetRef.current || document.getElementById('cover-page-render-target');
     if (!target) {
       setExportProgress({
@@ -112,11 +124,13 @@ export default function App() {
         setExportProgress(progress);
       });
     } catch (err) {
-      console.error(err);
+      console.error('PDF Export encountered error:', err);
     }
   };
 
   const handleExportJpg = async () => {
+    if (isExporting) return;
+
     const target = printTargetRef.current || document.getElementById('cover-page-render-target');
     if (!target) {
       setExportProgress({
@@ -131,13 +145,9 @@ export default function App() {
         setExportProgress(progress);
       });
     } catch (err) {
-      console.error(err);
+      console.error('JPG Export encountered error:', err);
     }
   };
-
-  const isExporting =
-    exportProgress !== null &&
-    ['preparing', 'rendering', 'saving'].includes(exportProgress.status);
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans text-slate-900 selection:bg-blue-100 selection:text-blue-900">
@@ -173,8 +183,11 @@ export default function App() {
               onNavigateStep={setCurrentStep}
             />
 
-            {/* Hidden Target for Export Pre-caching if needed */}
-            <div className="hidden" aria-hidden="true">
+            {/* Offscreen Target for Export Pre-caching when on step 1 or 2 */}
+            <div
+              style={{ position: 'fixed', left: '-99999px', top: '0', pointerEvents: 'none', opacity: 0 }}
+              aria-hidden="true"
+            >
               <CoverPageRenderer
                 ref={printTargetRef}
                 data={coverData}
