@@ -1,0 +1,6 @@
+{
+  "name": "CoverLagbe? — BRAC University Assignment Cover Page Generator",
+  "description": "CoverLagbe? is the ultimate assignment cover page generator for BRAC University students. Create, customize, and export professional A4 cover pages in seconds.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
