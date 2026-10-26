@@ -53,24 +53,24 @@ export const GeometricBlueTemplate: React.FC<TemplateProps> = ({
 
       {/* TOP HEADER */}
       <div
-        className="relative z-10 flex items-center justify-between border-b-2 pb-5"
+        className="relative z-10 shrink-0 w-full flex items-center justify-between border-b-2 pb-5"
         style={{ borderColor: accentColor.border }}
       >
-        <div className="flex-1 pr-6">
+        <div className="min-w-0 flex-1 pr-6">
           <div className="flex items-center gap-2 mb-1">
             <span
-              className="w-2.5 h-2.5 rounded-sm"
+              className="w-2.5 h-2.5 rounded-sm shrink-0"
               style={{ backgroundColor: accentColor.primary }}
             />
             <h1
-              className="text-xs font-extrabold tracking-[0.2em] uppercase font-sans-modern"
+              className="text-xs font-extrabold tracking-[0.16em] uppercase font-sans-modern leading-snug break-words"
               style={{ color: accentColor.primary }}
             >
               {data.universityName || 'BRAC UNIVERSITY'}
             </h1>
           </div>
           {visibility.showDepartment && data.departmentName?.trim() && (
-            <p className="text-xs text-slate-600 font-medium pl-4">
+            <p className="text-xs text-slate-600 font-medium pl-4 leading-normal break-words mt-1">
               {data.departmentName}
             </p>
           )}
@@ -89,7 +89,7 @@ export const GeometricBlueTemplate: React.FC<TemplateProps> = ({
       </div>
 
       {/* CENTER: Geometric Title Presentation */}
-      <div className="relative z-10 my-auto py-6">
+      <div className="relative z-10 flex-1 w-full min-h-0 flex flex-col justify-center py-6">
         <div className="border-l-4 pl-6 py-2" style={{ borderColor: accentColor.primary }}>
           <div className="flex items-center flex-wrap gap-2.5 mb-2.5">
             {visibility.showAssignmentNo && data.assignmentNumber?.trim() && (
@@ -120,7 +120,7 @@ export const GeometricBlueTemplate: React.FC<TemplateProps> = ({
           </div>
 
           <h2
-            className={`${fontClass} text-[30px] leading-[1.25] font-extrabold text-slate-900 tracking-tight text-balance break-words`}
+            className={`${fontClass} text-[28px] leading-[1.28] font-extrabold text-slate-900 tracking-tight text-balance break-words`}
           >
             {data.assignmentTitle || 'Assignment Title'}
           </h2>
@@ -134,13 +134,13 @@ export const GeometricBlueTemplate: React.FC<TemplateProps> = ({
       </div>
 
       {/* BOTTOM SECTION: Symmetrical Stylized Cards */}
-      <div className="relative z-10 space-y-4 pt-4 border-t border-slate-100">
+      <div className="relative z-10 shrink-0 w-full space-y-4 pt-4 border-t border-slate-100">
         <div className="grid grid-cols-2 gap-5">
           {/* Student details */}
           <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-2xs">
             <div className="flex items-center gap-2 mb-3">
               <div
-                className="w-1.5 h-3.5 rounded-full"
+                className="w-1.5 h-3.5 rounded-full shrink-0"
                 style={{ backgroundColor: accentColor.primary }}
               />
               <span
@@ -178,7 +178,7 @@ export const GeometricBlueTemplate: React.FC<TemplateProps> = ({
             <div>
               <div className="flex items-center gap-2 mb-3">
                 <div
-                  className="w-1.5 h-3.5 rounded-full"
+                  className="w-1.5 h-3.5 rounded-full shrink-0"
                   style={{ backgroundColor: accentColor.secondary }}
                 />
                 <span

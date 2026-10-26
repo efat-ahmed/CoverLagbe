@@ -32,20 +32,20 @@ export const EditorialStyleTemplate: React.FC<TemplateProps> = ({
   return (
     <div className="relative w-full h-full bg-white text-slate-900 flex flex-col justify-between p-12 overflow-hidden select-none">
       {/* Editorial Top Lockup */}
-      <div className="border-b-2 pb-5" style={{ borderColor: accentColor.primary }}>
+      <div className="shrink-0 w-full border-b-2 pb-5" style={{ borderColor: accentColor.primary }}>
         <div className="flex items-center justify-between gap-6">
-          <div>
+          <div className="min-w-0 flex-1 pr-4">
             <span
-              className="text-[10px] font-bold tracking-[0.3em] uppercase block mb-1 font-sans-modern"
+              className="text-[10px] font-bold tracking-[0.2em] uppercase block mb-1 font-sans-modern"
               style={{ color: accentColor.primary }}
             >
               Academic Coursework & Research
             </span>
-            <h1 className="text-xl font-bold tracking-tight uppercase text-slate-900 font-sans-modern">
+            <h1 className="text-xl font-bold tracking-tight uppercase text-slate-900 font-sans-modern leading-snug break-words">
               {data.universityName || 'BRAC UNIVERSITY'}
             </h1>
             {visibility.showDepartment && data.departmentName?.trim() && (
-              <p className="text-xs text-slate-600 mt-0.5 font-medium">
+              <p className="text-xs text-slate-600 mt-1 font-medium leading-normal break-words">
                 {data.departmentName}
               </p>
             )}
@@ -65,9 +65,9 @@ export const EditorialStyleTemplate: React.FC<TemplateProps> = ({
       </div>
 
       {/* CENTER: Strong Editorial Title Area */}
-      <div className="my-auto py-6">
+      <div className="flex-1 w-full min-h-0 flex flex-col justify-center py-6">
         {/* Course, Semester & Assignment Header */}
-        <div className="flex items-center gap-3 text-xs font-semibold text-slate-600 mb-4 pb-2 border-b border-slate-100">
+        <div className="flex items-center flex-wrap gap-3 text-xs font-semibold text-slate-600 mb-4 pb-2 border-b border-slate-100">
           {visibility.showCourseCode && data.courseCode?.trim() && (
             <span
               className="px-2 py-0.5 rounded font-mono-code font-bold text-xs"
@@ -77,7 +77,7 @@ export const EditorialStyleTemplate: React.FC<TemplateProps> = ({
             </span>
           )}
           {data.courseTitle?.trim() && (
-            <span className="text-slate-800">{data.courseTitle}</span>
+            <span className="text-slate-800 tracking-wide">{data.courseTitle}</span>
           )}
           {visibility.showSemester && data.semester?.trim() && (
             <>
@@ -101,7 +101,7 @@ export const EditorialStyleTemplate: React.FC<TemplateProps> = ({
           )}
 
           <h2
-            className={`${fontClass} text-[32px] leading-[1.22] font-bold text-slate-900 tracking-tight text-balance break-words`}
+            className={`${fontClass} text-[30px] leading-[1.25] font-bold text-slate-900 tracking-tight text-balance break-words`}
           >
             {data.assignmentTitle || 'Assignment Title'}
           </h2>
@@ -109,7 +109,7 @@ export const EditorialStyleTemplate: React.FC<TemplateProps> = ({
       </div>
 
       {/* BOTTOM: Editorial Metadata Grid */}
-      <div className="space-y-4 pt-6 border-t border-slate-200">
+      <div className="shrink-0 w-full space-y-4 pt-6 border-t border-slate-200">
         <div className="grid grid-cols-2 gap-6 text-xs">
           {/* Author / Student column */}
           <div className="space-y-3">

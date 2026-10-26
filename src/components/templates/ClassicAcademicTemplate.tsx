@@ -58,11 +58,11 @@ export const ClassicAcademicTemplate: React.FC<TemplateProps> = ({
         />
       </div>
 
-      {/* TOP INSTITUTION SECTION */}
-      <div className="relative z-10 flex flex-col items-center text-center pt-3">
+      {/* TOP INSTITUTION SECTION - Dedicated uncollapsing vertical flow */}
+      <div className="relative z-10 shrink-0 w-full flex flex-col items-center text-center pt-2">
         {/* University Official Monogram Logo */}
         {visibility.showLogo && (
-          <div className="mb-4 flex items-center justify-center">
+          <div className="mb-3 flex items-center justify-center">
             <UniversityLogo
               logoUrl={logoUrl}
               isConfigured={isLogoConfigured}
@@ -72,9 +72,9 @@ export const ClassicAcademicTemplate: React.FC<TemplateProps> = ({
           </div>
         )}
 
-        {/* University Name */}
+        {/* University Name: Robust wrapping, explicit leading, no text collision */}
         <h1
-          className={`${fontClass} text-2xl font-bold tracking-[0.22em] uppercase max-w-[620px] transition-colors`}
+          className={`${fontClass} text-[22px] leading-snug font-bold tracking-[0.14em] uppercase w-full max-w-[620px] text-center break-words transition-colors`}
           style={{ color: accentColor.primary }}
         >
           {data.universityName || 'BRAC UNIVERSITY'}
@@ -82,27 +82,27 @@ export const ClassicAcademicTemplate: React.FC<TemplateProps> = ({
 
         {/* Department Name */}
         {visibility.showDepartment && data.departmentName?.trim() && (
-          <p className="text-xs uppercase tracking-[0.18em] text-slate-600 mt-1.5 max-w-[580px] font-sans-modern font-semibold">
+          <p className="text-[12px] leading-normal uppercase tracking-[0.12em] text-slate-600 mt-1 max-w-[580px] w-full text-center font-sans-modern font-semibold break-words">
             {data.departmentName}
           </p>
         )}
 
         {/* Elegant Academic Emblem Divider */}
-        <div className="flex items-center justify-center gap-2.5 my-3.5 w-56 opacity-85">
+        <div className="flex items-center justify-center gap-2.5 mt-3 mb-1 w-52 opacity-85">
           <div className="h-[1px] flex-1 bg-slate-300" />
           <div
-            className="w-2 h-2 rotate-45"
+            className="w-2 h-2 rotate-45 shrink-0"
             style={{ backgroundColor: accentColor.primary }}
           />
           <div className="h-[1px] flex-1 bg-slate-300" />
         </div>
       </div>
 
-      {/* CENTER ASSIGNMENT & COURSE BODY SECTION */}
-      <div className="relative z-10 flex flex-col items-center text-center my-auto py-4 px-6 max-w-[660px] mx-auto w-full">
+      {/* CENTER ASSIGNMENT & COURSE BODY SECTION - Flex-1 centered without margin conflicts */}
+      <div className="relative z-10 flex-1 w-full min-h-0 flex flex-col items-center justify-center text-center py-4 px-6 max-w-[660px] mx-auto">
         {/* Course Code & Title Academic Header */}
         {(Boolean(visibility.showCourseCode && data.courseCode?.trim()) || Boolean(data.courseTitle?.trim())) && (
-          <div className="mb-3.5 flex flex-col items-center gap-1 font-sans-modern">
+          <div className="mb-3 flex flex-col items-center gap-1 font-sans-modern">
             <div className="inline-flex items-center justify-center flex-wrap gap-2 text-xs font-bold uppercase tracking-wider text-slate-700">
               {visibility.showCourseCode && data.courseCode?.trim() && (
                 <span
@@ -126,7 +126,7 @@ export const ClassicAcademicTemplate: React.FC<TemplateProps> = ({
         {/* Assignment Number Kicker */}
         {visibility.showAssignmentNo && data.assignmentNumber?.trim() && (
           <span
-            className="text-[11px] font-bold uppercase tracking-[0.22em] mb-2 px-3 py-0.5 rounded-sm"
+            className="text-[11px] font-bold uppercase tracking-[0.2em] mb-2 px-3 py-0.5 rounded-sm"
             style={{ color: accentColor.primary, backgroundColor: accentColor.tint }}
           >
             {data.assignmentNumber}
@@ -134,9 +134,9 @@ export const ClassicAcademicTemplate: React.FC<TemplateProps> = ({
         )}
 
         {/* Main Assignment Title */}
-        <div className="my-2 max-w-[600px]">
+        <div className="my-2 max-w-[600px] w-full">
           <h2
-            className={`${fontClass} text-[27px] leading-[1.32] font-bold text-slate-900 tracking-tight text-balance break-words`}
+            className={`${fontClass} text-[26px] leading-[1.3] font-bold text-slate-900 tracking-tight text-balance break-words`}
           >
             {data.assignmentTitle || 'Assignment Topic Title'}
           </h2>
@@ -144,7 +144,7 @@ export const ClassicAcademicTemplate: React.FC<TemplateProps> = ({
 
         {/* Semester Indicator */}
         {visibility.showSemester && data.semester?.trim() && (
-          <div className="mt-3.5 inline-flex items-center gap-2 px-3.5 py-1 rounded-full border border-slate-200 bg-slate-50/70 font-sans-modern">
+          <div className="mt-2.5 inline-flex items-center gap-2 px-3.5 py-1 rounded-full border border-slate-200 bg-slate-50/70 font-sans-modern">
             <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: accentColor.primary }} />
             <span className="text-xs uppercase font-medium text-slate-600 tracking-wider">
               Semester: <span className="font-bold text-slate-900">{data.semester}</span>
@@ -154,9 +154,9 @@ export const ClassicAcademicTemplate: React.FC<TemplateProps> = ({
       </div>
 
       {/* BOTTOM FORMAL ACADEMIC SUBMISSION SECTION */}
-      <div className="relative z-10 w-full pt-4">
+      <div className="relative z-10 shrink-0 w-full pt-2">
         {/* Upper Light-Gray Horizontal Dividers: perfectly aligned on the same horizontal axis with balanced central gap */}
-        <div className="grid grid-cols-2 gap-8 max-w-[650px] mx-auto mb-4">
+        <div className="grid grid-cols-2 gap-8 max-w-[650px] mx-auto mb-3">
           <div className="h-[1.5px] bg-slate-200 w-full" />
           <div className="h-[1.5px] bg-slate-200 w-full" />
         </div>
@@ -224,7 +224,6 @@ export const ClassicAcademicTemplate: React.FC<TemplateProps> = ({
                   {data.departmentName}
                 </p>
               )}
-              <p className="text-slate-500 text-[12px] font-medium">{data.universityName || 'BRAC University'}</p>
             </div>
           </div>
         </div>
@@ -245,7 +244,7 @@ export const ClassicAcademicTemplate: React.FC<TemplateProps> = ({
 
         {/* Bottom Submission Date */}
         {visibility.showDate && data.submissionDate?.trim() && (
-          <div className="mt-5 pt-3 text-center text-[11px] tracking-wide text-slate-600 font-sans-modern border-t border-slate-200">
+          <div className="mt-4 pt-2.5 text-center text-[11px] tracking-wide text-slate-600 font-sans-modern border-t border-slate-200">
             <span>Date of Submission: </span>
             <span className="font-bold text-slate-900">{data.submissionDate}</span>
           </div>

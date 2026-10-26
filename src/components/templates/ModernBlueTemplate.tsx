@@ -33,32 +33,32 @@ export const ModernBlueTemplate: React.FC<TemplateProps> = ({
     <div className="relative w-full h-full bg-white text-slate-900 flex flex-col justify-between p-12 overflow-hidden select-none">
       {/* Top Professional University Blue Accent Stripe */}
       <div
-        className="absolute top-0 left-0 right-0 h-2"
+        className="absolute top-0 left-0 right-0 h-2 pointer-events-none"
         style={{ backgroundColor: accentColor.primary }}
       />
       {/* Subtle corner architectural accent */}
       <div
-        className="absolute top-2 right-0 w-28 h-1 opacity-50"
+        className="absolute top-2 right-0 w-28 h-1 opacity-50 pointer-events-none"
         style={{ backgroundColor: accentColor.secondary }}
       />
 
       {/* TOP HEADER: Asymmetric Blue Identity Lockup */}
-      <div className="flex items-start justify-between gap-6 pt-2 pb-5 border-b border-slate-100">
-        <div className="flex-1 pr-4">
+      <div className="shrink-0 w-full flex items-start justify-between gap-6 pt-2 pb-5 border-b border-slate-100">
+        <div className="min-w-0 flex-1 pr-4">
           <div className="flex items-center gap-2 mb-1">
             <span
-              className="w-2.5 h-2.5 rounded-xs"
+              className="w-2.5 h-2.5 rounded-xs shrink-0"
               style={{ backgroundColor: accentColor.primary }}
             />
-            <p
-              className="text-xs font-extrabold tracking-[0.22em] uppercase font-sans-modern"
+            <h1
+              className="text-xs font-extrabold tracking-[0.16em] uppercase font-sans-modern leading-snug break-words"
               style={{ color: accentColor.primary }}
             >
               {data.universityName || 'BRAC UNIVERSITY'}
-            </p>
+            </h1>
           </div>
           {visibility.showDepartment && data.departmentName?.trim() && (
-            <p className="text-xs text-slate-600 font-medium pl-4 leading-snug">
+            <p className="text-xs text-slate-600 font-medium pl-4 leading-normal break-words mt-1">
               {data.departmentName}
             </p>
           )}
@@ -77,7 +77,7 @@ export const ModernBlueTemplate: React.FC<TemplateProps> = ({
       </div>
 
       {/* CENTER: Hero Assignment Title & Course Info */}
-      <div className="my-auto py-4">
+      <div className="flex-1 w-full min-h-0 flex flex-col justify-center py-4">
         {/* Course Code & Semester Kicker */}
         <div className="flex items-center flex-wrap gap-2 mb-3 text-xs font-semibold">
           {visibility.showAssignmentNo && data.assignmentNumber?.trim() && (
@@ -119,7 +119,7 @@ export const ModernBlueTemplate: React.FC<TemplateProps> = ({
         {/* Assignment Title with Left Blue Accent */}
         <div className="border-l-4 pl-5 py-1.5" style={{ borderColor: accentColor.primary }}>
           <h2
-            className={`${fontClass} text-3xl font-extrabold text-slate-900 leading-[1.25] tracking-tight text-balance break-words`}
+            className={`${fontClass} text-[28px] font-extrabold text-slate-900 leading-[1.28] tracking-tight text-balance break-words`}
           >
             {data.assignmentTitle || 'Assignment Title'}
           </h2>
@@ -127,13 +127,13 @@ export const ModernBlueTemplate: React.FC<TemplateProps> = ({
       </div>
 
       {/* BOTTOM: Structured Surface Cards */}
-      <div className="space-y-4 pt-4 border-t border-slate-200">
+      <div className="shrink-0 w-full space-y-4 pt-4 border-t border-slate-200">
         <div className="grid grid-cols-2 gap-4">
           {/* Student(s) Card */}
           <div className="p-4 rounded-xl bg-slate-50/80 border border-slate-200">
             <div className="flex items-center gap-1.5 mb-2.5">
               <span
-                className="w-1.5 h-1.5 rounded-full"
+                className="w-1.5 h-1.5 rounded-full shrink-0"
                 style={{ backgroundColor: accentColor.primary }}
               />
               <p
@@ -171,7 +171,7 @@ export const ModernBlueTemplate: React.FC<TemplateProps> = ({
             <div>
               <div className="flex items-center gap-1.5 mb-2.5">
                 <span
-                  className="w-1.5 h-1.5 rounded-full"
+                  className="w-1.5 h-1.5 rounded-full shrink-0"
                   style={{ backgroundColor: accentColor.primary }}
                 />
                 <p

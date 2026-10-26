@@ -33,22 +33,22 @@ export const PremiumFormalTemplate: React.FC<TemplateProps> = ({
     <div className="relative w-full h-full bg-white text-slate-900 flex flex-col justify-between overflow-hidden select-none">
       {/* TOP EXECUTIVE ACCENT HEADER BAND */}
       <div
-        className="px-10 py-6 text-white flex items-center justify-between gap-6"
+        className="shrink-0 w-full px-10 py-5 text-white flex items-center justify-between gap-6"
         style={{ backgroundColor: accentColor.primary }}
       >
-        <div className="space-y-1">
-          <p className="text-[11px] font-bold tracking-[0.25em] uppercase text-white/90">
+        <div className="min-w-0 flex-1 space-y-1">
+          <h1 className="text-[12px] font-bold tracking-[0.18em] uppercase text-white/95 leading-snug break-words">
             {data.universityName || 'BRAC UNIVERSITY'}
-          </p>
+          </h1>
           {visibility.showDepartment && data.departmentName?.trim() && (
-            <p className="text-xs text-white/80 font-normal tracking-wide">
+            <p className="text-xs text-white/85 font-normal tracking-wide leading-normal break-words">
               {data.departmentName}
             </p>
           )}
         </div>
 
         {visibility.showLogo && (
-          <div className="bg-white p-2 rounded-lg shadow-sm shrink-0">
+          <div className="bg-white p-2 rounded-lg shadow-xs shrink-0">
             <UniversityLogo
               logoUrl={logoUrl}
               isConfigured={isLogoConfigured}
@@ -60,7 +60,7 @@ export const PremiumFormalTemplate: React.FC<TemplateProps> = ({
       </div>
 
       {/* MAIN BODY AREA */}
-      <div className="px-10 flex-1 flex flex-col justify-between py-6">
+      <div className="flex-1 w-full min-h-0 px-10 flex flex-col justify-between py-5">
         {/* Document Classification & Title Block */}
         <div className="my-auto py-2">
           {/* Classification Tags */}
@@ -91,7 +91,7 @@ export const PremiumFormalTemplate: React.FC<TemplateProps> = ({
 
           {/* Assignment Title */}
           <h2
-            className={`${fontClass} text-[28px] leading-[1.3] font-extrabold text-slate-950 tracking-tight text-balance break-words`}
+            className={`${fontClass} text-[26px] leading-[1.3] font-extrabold text-slate-950 tracking-tight text-balance break-words`}
           >
             {data.assignmentTitle || 'Assignment Report Title'}
           </h2>
@@ -106,7 +106,7 @@ export const PremiumFormalTemplate: React.FC<TemplateProps> = ({
         </div>
 
         {/* STRUCTURED TABULAR STUDENTS & FACULTY SECTION */}
-        <div className="space-y-4 pt-4">
+        <div className="shrink-0 space-y-4 pt-3">
           {/* Students Table */}
           <div className="border border-slate-200 rounded-lg overflow-hidden">
             <div
@@ -199,9 +199,9 @@ export const PremiumFormalTemplate: React.FC<TemplateProps> = ({
       </div>
 
       {/* EXECUTIVE FOOTER BAR */}
-      <div className="px-10 py-3 bg-slate-100 border-t border-slate-200 flex items-center justify-between text-[10px] text-slate-500 font-sans-modern">
+      <div className="shrink-0 w-full px-10 py-2.5 bg-slate-100 border-t border-slate-200 flex items-center justify-between text-[10px] text-slate-500 font-sans-modern">
         <span>Official Academic Coursework Document</span>
-        <span className="font-medium">{data.universityName || 'BRAC University'}</span>
+        <span>Faculty Evaluation Copy</span>
         {visibility.showDate && data.submissionDate?.trim() && (
           <span>{data.submissionDate}</span>
         )}

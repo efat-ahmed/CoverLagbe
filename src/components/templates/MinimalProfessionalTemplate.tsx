@@ -32,21 +32,21 @@ export const MinimalProfessionalTemplate: React.FC<TemplateProps> = ({
   return (
     <div className="relative w-full h-full bg-white text-slate-900 flex flex-col justify-between p-14 overflow-hidden select-none border border-slate-200">
       {/* Delicate corner markers */}
-      <div className="absolute top-4 left-4 w-3 h-3 border-t border-l border-slate-300" />
-      <div className="absolute top-4 right-4 w-3 h-3 border-t border-r border-slate-300" />
-      <div className="absolute bottom-4 left-4 w-3 h-3 border-b border-l border-slate-300" />
-      <div className="absolute bottom-4 right-4 w-3 h-3 border-b border-r border-slate-300" />
+      <div className="absolute top-4 left-4 w-3 h-3 border-t border-l border-slate-300 pointer-events-none" />
+      <div className="absolute top-4 right-4 w-3 h-3 border-t border-r border-slate-300 pointer-events-none" />
+      <div className="absolute bottom-4 left-4 w-3 h-3 border-b border-l border-slate-300 pointer-events-none" />
+      <div className="absolute bottom-4 right-4 w-3 h-3 border-b border-r border-slate-300 pointer-events-none" />
 
       {/* TOP: Understated Institutional Header */}
-      <div className="flex items-start justify-between gap-6 pb-6 border-b border-slate-100">
-        <div>
+      <div className="shrink-0 w-full flex items-start justify-between gap-6 pb-6 border-b border-slate-100">
+        <div className="min-w-0 flex-1 pr-4">
           <h1
-            className="text-xs font-bold tracking-[0.25em] uppercase font-sans-modern text-slate-900"
+            className="text-xs font-bold tracking-[0.18em] uppercase font-sans-modern text-slate-900 leading-snug break-words"
           >
             {data.universityName || 'BRAC UNIVERSITY'}
           </h1>
           {visibility.showDepartment && data.departmentName?.trim() && (
-            <p className="text-[11px] text-slate-500 font-medium mt-1 tracking-wider uppercase">
+            <p className="text-[11px] text-slate-500 font-medium mt-1 tracking-wider uppercase leading-snug break-words">
               {data.departmentName}
             </p>
           )}
@@ -65,9 +65,9 @@ export const MinimalProfessionalTemplate: React.FC<TemplateProps> = ({
       </div>
 
       {/* CENTER: Title and Course Identity */}
-      <div className="my-auto py-6 max-w-[620px]">
+      <div className="flex-1 w-full min-h-0 flex flex-col justify-center py-6 max-w-[620px]">
         {/* Unboxed Metadata Kicker */}
-        <div className="flex items-center gap-2 mb-4 text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
+        <div className="flex items-center flex-wrap gap-2 mb-4 text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
           {visibility.showCourseCode && data.courseCode?.trim() && (
             <span className="font-mono-code font-bold text-slate-900">{data.courseCode}</span>
           )}
@@ -89,7 +89,7 @@ export const MinimalProfessionalTemplate: React.FC<TemplateProps> = ({
 
         {/* Title */}
         <h2
-          className={`${fontClass} text-3xl font-extrabold text-slate-950 leading-[1.28] tracking-tight text-balance break-words`}
+          className={`${fontClass} text-[28px] font-extrabold text-slate-950 leading-[1.3] tracking-tight text-balance break-words`}
         >
           {data.assignmentTitle || 'Assignment Title'}
         </h2>
@@ -104,7 +104,7 @@ export const MinimalProfessionalTemplate: React.FC<TemplateProps> = ({
       </div>
 
       {/* BOTTOM: Minimalist 2-Column Academic Data */}
-      <div className="pt-6 border-t border-slate-200 text-xs">
+      <div className="shrink-0 w-full pt-6 border-t border-slate-200 text-xs">
         <div className="grid grid-cols-2 gap-8">
           {/* Submitted By */}
           <div>
