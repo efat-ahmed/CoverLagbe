@@ -22,6 +22,7 @@ import { saveDraft, loadSavedDraft, clearSavedDraft } from './utils/storage';
 import { exportToPdf, exportToJpg, ExportProgress } from './utils/exportUtils';
 import { preloadFontEmbedCSS } from './utils/fontUtils';
 import { CoverPageRenderer } from './components/templates/CoverPageRenderer';
+import { Footer } from './components/Footer';
 
 export default function App() {
   // main form state
@@ -211,6 +212,9 @@ export default function App() {
           />
         )}
       </main>
+ 
+      {/* Footer (appears at the very bottom when scrolled, not sticky) */}
+      <Footer />
 
       {/* Institutional Logo Configuration Modal (Admin Setup) */}
       <AdminLogoModal
