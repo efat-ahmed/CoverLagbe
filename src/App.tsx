@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useEffect, useRef } from 'react';
+import { Analytics } from '@vercel/analytics/react';
 import { CoverPageData } from './types/coverPage';
 import { INITIAL_COVER_PAGE_DATA, SAMPLE_PROJECTS } from './config/constants';
 import { Header } from './components/Header';
@@ -235,6 +236,9 @@ export default function App() {
         progress={exportProgress}
         onClose={() => setExportProgress(null)}
       />
+
+      {/* Vercel Web Analytics */}
+      <Analytics />
     </div>
   );
 }
