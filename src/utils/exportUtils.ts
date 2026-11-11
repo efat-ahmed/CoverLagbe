@@ -12,6 +12,7 @@ export interface ExportProgress {
   status: 'idle' | 'preparing' | 'rendering' | 'saving' | 'success' | 'error';
   message: string;
   error?: string;
+  warning?: string;
 }
 
 // Exact A4 Dimensions at 96 DPI baseline
@@ -164,32 +165,49 @@ export async function exportToJpg(
 
     onProgress?.({
       status: 'rendering',
-      message: 'Rasterizing A4 cover page at ultra-high 300 DPI print quality...',
+      message: 'Rasterizing A4 cover page at high-resolution print quality...',
     });
 
-    // 3.125 pixel ratio on 794x1123 yields ~2481 x 3509 pixels (standard 300 DPI A4)
-    const pixelRatio = 3.125;
-    const canvasWidth = Math.round(A4_WIDTH_PX * pixelRatio);
-    const canvasHeight = Math.round(A4_HEIGHT_PX * pixelRatio);
+    // Fallback retry sequence for memory-constrained environments: 3.125 (300 DPI) -> 2.0 -> 1.5
+    const fallbackRatios = [3.125, 2.0, 1.5];
+    let dataUrl: string | null = null;
+    let chosenRatio = 3.125;
+    let lastError: unknown = null;
 
-    const dataUrl = await toJpeg(context.exportNode, {
-      quality: 0.98,
-      pixelRatio,
-      width: A4_WIDTH_PX,
-      height: A4_HEIGHT_PX,
-      canvasWidth,
-      canvasHeight,
-      backgroundColor: '#FFFFFF',
-      cacheBust: true,
-      fontEmbedCSS: fontEmbedCSS || undefined,
-      style: {
-        transform: 'none',
-        margin: '0',
-        padding: '0',
-        width: `${A4_WIDTH_PX}px`,
-        height: `${A4_HEIGHT_PX}px`,
-      },
-    });
+    for (const ratio of fallbackRatios) {
+      try {
+        const canvasWidth = Math.round(A4_WIDTH_PX * ratio);
+        const canvasHeight = Math.round(A4_HEIGHT_PX * ratio);
+
+        dataUrl = await toJpeg(context.exportNode, {
+          quality: 0.98,
+          pixelRatio: ratio,
+          width: A4_WIDTH_PX,
+          height: A4_HEIGHT_PX,
+          canvasWidth,
+          canvasHeight,
+          backgroundColor: '#FFFFFF',
+          cacheBust: true,
+          fontEmbedCSS: fontEmbedCSS || undefined,
+          style: {
+            transform: 'none',
+            margin: '0',
+            padding: '0',
+            width: `${A4_WIDTH_PX}px`,
+            height: `${A4_HEIGHT_PX}px`,
+          },
+        });
+        chosenRatio = ratio;
+        break;
+      } catch (err) {
+        lastError = err;
+        console.warn(`JPG render at pixelRatio ${ratio} encountered memory or canvas error, trying fallback...`, err);
+      }
+    }
+
+    if (!dataUrl) {
+      throw lastError || new Error('Failed to render JPG at all quality levels');
+    }
 
     onProgress?.({
       status: 'saving',
@@ -204,9 +222,19 @@ export async function exportToJpg(
     link.click();
     document.body.removeChild(link);
 
+    const qualityLabel =
+      chosenRatio === 3.125
+        ? '300 DPI Ultra-High'
+        : chosenRatio === 2.0
+        ? 'High (2.0x fallback)'
+        : 'Standard (1.5x fallback)';
+
     onProgress?.({
       status: 'success',
-      message: `Downloaded "${filename}" successfully!`,
+      message: `Downloaded "${filename}" successfully! (${qualityLabel})`,
+      warning: !fontEmbedCSS
+        ? 'Fonts could not be embedded; system fallback fonts were used.'
+        : undefined,
     });
   } catch (error) {
     console.error('Error exporting JPG:', error);
@@ -251,28 +279,45 @@ export async function exportToPdf(
       message: 'Generating vector-crisp A4 page for document export...',
     });
 
-    // 2.5 pixel ratio yields ~1985 x 2807 px, pristine razor-sharp text and graphics in PDF
-    const pixelRatio = 2.5;
-    const canvasWidth = Math.round(A4_WIDTH_PX * pixelRatio);
-    const canvasHeight = Math.round(A4_HEIGHT_PX * pixelRatio);
+    // Fallback retry sequence for PDF rasterization: 2.5 (vector-crisp) -> 2.0 -> 1.5
+    const fallbackRatios = [2.5, 2.0, 1.5];
+    let dataUrl: string | null = null;
+    let chosenRatio = 2.5;
+    let lastError: unknown = null;
 
-    const dataUrl = await toPng(context.exportNode, {
-      pixelRatio,
-      width: A4_WIDTH_PX,
-      height: A4_HEIGHT_PX,
-      canvasWidth,
-      canvasHeight,
-      backgroundColor: '#FFFFFF',
-      cacheBust: true,
-      fontEmbedCSS: fontEmbedCSS || undefined,
-      style: {
-        transform: 'none',
-        margin: '0',
-        padding: '0',
-        width: `${A4_WIDTH_PX}px`,
-        height: `${A4_HEIGHT_PX}px`,
-      },
-    });
+    for (const ratio of fallbackRatios) {
+      try {
+        const canvasWidth = Math.round(A4_WIDTH_PX * ratio);
+        const canvasHeight = Math.round(A4_HEIGHT_PX * ratio);
+
+        dataUrl = await toPng(context.exportNode, {
+          pixelRatio: ratio,
+          width: A4_WIDTH_PX,
+          height: A4_HEIGHT_PX,
+          canvasWidth,
+          canvasHeight,
+          backgroundColor: '#FFFFFF',
+          cacheBust: true,
+          fontEmbedCSS: fontEmbedCSS || undefined,
+          style: {
+            transform: 'none',
+            margin: '0',
+            padding: '0',
+            width: `${A4_WIDTH_PX}px`,
+            height: `${A4_HEIGHT_PX}px`,
+          },
+        });
+        chosenRatio = ratio;
+        break;
+      } catch (err) {
+        lastError = err;
+        console.warn(`PDF render at pixelRatio ${ratio} encountered memory or canvas error, trying fallback...`, err);
+      }
+    }
+
+    if (!dataUrl) {
+      throw lastError || new Error('Failed to render PDF at all quality levels');
+    }
 
     onProgress?.({
       status: 'saving',
@@ -293,9 +338,19 @@ export async function exportToPdf(
     const filename = generateFilename(data, 'pdf');
     pdf.save(filename);
 
+    const qualityLabel =
+      chosenRatio === 2.5
+        ? 'Vector-Crisp (2.5x)'
+        : chosenRatio === 2.0
+        ? 'High (2.0x fallback)'
+        : 'Standard (1.5x fallback)';
+
     onProgress?.({
       status: 'success',
-      message: `Downloaded "${filename}" successfully!`,
+      message: `Downloaded "${filename}" successfully! (${qualityLabel})`,
+      warning: !fontEmbedCSS
+        ? 'Fonts could not be embedded; system fallback fonts were used.'
+        : undefined,
     });
   } catch (error) {
     console.error('Error exporting PDF:', error);

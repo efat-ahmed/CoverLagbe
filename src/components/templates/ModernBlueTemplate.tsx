@@ -29,8 +29,10 @@ export const ModernBlueTemplate: React.FC<TemplateProps> = ({
       ? 'font-serif-classic'
       : 'font-sans-modern';
 
+  const isCompact = data.students.length > 3;
+
   return (
-    <div className="relative w-full h-full bg-white text-slate-900 flex flex-col justify-between p-12 overflow-hidden select-none">
+    <div className={`relative w-full h-full bg-white text-slate-900 flex flex-col justify-between ${isCompact ? 'p-8 px-10' : 'p-12'} overflow-hidden select-none`}>
       {/* Top Professional University Blue Accent Stripe */}
       <div
         className="absolute top-0 left-0 right-0 h-2 pointer-events-none"
@@ -117,9 +119,9 @@ export const ModernBlueTemplate: React.FC<TemplateProps> = ({
         </div>
 
         {/* Assignment Title with Left Blue Accent */}
-        <div className="border-l-4 pl-5 py-1.5" style={{ borderColor: accentColor.primary }}>
+        <div className={`border-l-4 ${isCompact ? 'pl-4 py-1' : 'pl-5 py-1.5'}`} style={{ borderColor: accentColor.primary }}>
           <h2
-            className={`${fontClass} text-[28px] font-extrabold text-slate-900 leading-[1.28] tracking-tight text-balance break-words`}
+            className={`${fontClass} ${isCompact ? 'text-[24px] leading-[1.25]' : 'text-[28px] leading-[1.28]'} font-extrabold text-slate-900 tracking-tight text-balance break-words`}
           >
             {data.assignmentTitle || 'Assignment Title'}
           </h2>
@@ -127,11 +129,11 @@ export const ModernBlueTemplate: React.FC<TemplateProps> = ({
       </div>
 
       {/* BOTTOM: Structured Surface Cards */}
-      <div className="shrink-0 w-full space-y-4 pt-4 border-t border-slate-200">
+      <div className={`shrink-0 w-full ${isCompact ? 'space-y-2 pt-2' : 'space-y-4 pt-4'} border-t border-slate-200`}>
         <div className="grid grid-cols-2 gap-4">
           {/* Student(s) Card */}
-          <div className="p-4 rounded-xl bg-slate-50/80 border border-slate-200">
-            <div className="flex items-center gap-1.5 mb-2.5">
+          <div className={`${isCompact ? 'p-3' : 'p-4'} rounded-xl bg-slate-50/80 border border-slate-200`}>
+            <div className={`flex items-center gap-1.5 ${isCompact ? 'mb-1.5' : 'mb-2.5'}`}>
               <span
                 className="w-1.5 h-1.5 rounded-full shrink-0"
                 style={{ backgroundColor: accentColor.primary }}
@@ -144,20 +146,31 @@ export const ModernBlueTemplate: React.FC<TemplateProps> = ({
               </p>
             </div>
 
-            <div className="space-y-3">
+            <div className={isCompact ? 'space-y-1.5' : 'space-y-3'}>
               {data.students.map((student, idx) => (
                 <div key={student.id || idx} className="space-y-0.5">
-                  <p className="font-bold text-slate-900 text-[14.5px]">
+                  <p className={`font-bold text-slate-900 ${isCompact ? 'text-[13px] leading-tight' : 'text-[14.5px]'}`}>
                     {student.name?.trim() || 'Student Name'}
                   </p>
                   {student.studentId?.trim() && (
-                    <p className="font-mono-code tabular-nums text-[13px] text-slate-600">
+                    <p className={`font-mono-code tabular-nums ${isCompact ? 'text-[11.5px] leading-tight' : 'text-[13px]'} text-slate-600`}>
                       <span className="text-slate-400 font-sans">ID: </span>
                       {student.studentId}
+                      {isCompact && visibility.showSection && student.section?.trim() && (
+                        <span className="ml-2 pl-2 border-l border-slate-200">
+                          <span className="text-slate-400 font-sans">Sec: </span>
+                          <span className="text-slate-600 font-sans">{student.section}</span>
+                        </span>
+                      )}
                     </p>
                   )}
-                  {visibility.showSection && student.section?.trim() && (
+                  {!isCompact && visibility.showSection && student.section?.trim() && (
                     <p className="text-[13px] text-slate-500 pt-0.5">
+                      <span>Section: {student.section}</span>
+                    </p>
+                  )}
+                  {isCompact && !student.studentId?.trim() && visibility.showSection && student.section?.trim() && (
+                    <p className="text-[11.5px] text-slate-500 leading-tight">
                       <span>Section: {student.section}</span>
                     </p>
                   )}
@@ -167,9 +180,9 @@ export const ModernBlueTemplate: React.FC<TemplateProps> = ({
           </div>
 
           {/* Instructor Card */}
-          <div className="p-4 rounded-xl bg-slate-50/80 border border-slate-200 flex flex-col justify-between">
+          <div className={`${isCompact ? 'p-3' : 'p-4'} rounded-xl bg-slate-50/80 border border-slate-200 flex flex-col justify-between`}>
             <div>
-              <div className="flex items-center gap-1.5 mb-2.5">
+              <div className={`flex items-center gap-1.5 ${isCompact ? 'mb-1.5' : 'mb-2.5'}`}>
                 <span
                   className="w-1.5 h-1.5 rounded-full shrink-0"
                   style={{ backgroundColor: accentColor.primary }}
@@ -182,19 +195,19 @@ export const ModernBlueTemplate: React.FC<TemplateProps> = ({
                 </p>
               </div>
 
-              <p className="font-bold text-slate-900 text-[14.5px]">
+              <p className={`font-bold text-slate-900 ${isCompact ? 'text-[13px] leading-tight' : 'text-[14.5px]'}`}>
                 {data.teacherName?.trim() || 'Faculty Name'}
               </p>
               {visibility.showTeacherDesignation && data.teacherDesignation?.trim() && (
-                <p className="text-slate-600 text-[13px] mt-0.5">{data.teacherDesignation}</p>
+                <p className={`text-slate-600 ${isCompact ? 'text-[11.5px] leading-tight' : 'text-[13px]'} mt-0.5`}>{data.teacherDesignation}</p>
               )}
               {visibility.showDepartment && data.departmentName?.trim() && (
-                <p className="text-slate-500 text-[12px] mt-1">{data.departmentName}</p>
+                <p className={`text-slate-500 ${isCompact ? 'text-[11px] leading-tight' : 'text-[12px]'} mt-0.5`}>{data.departmentName}</p>
               )}
             </div>
 
             {visibility.showDate && data.submissionDate?.trim() && (
-              <div className="pt-3 border-t border-slate-200 mt-3 text-[11px] text-slate-600">
+              <div className={`${isCompact ? 'pt-1.5 mt-1.5' : 'pt-3 mt-3'} border-t border-slate-200 text-[11px] text-slate-600`}>
                 <span className="text-slate-400">Date: </span>
                 <span className="font-semibold text-slate-800">{data.submissionDate}</span>
               </div>
@@ -204,7 +217,7 @@ export const ModernBlueTemplate: React.FC<TemplateProps> = ({
 
         {/* Custom Metadata row */}
         {visibility.showCustomFields && data.customFields && data.customFields.length > 0 && (
-          <div className="flex flex-wrap items-center gap-4 text-[11px] text-slate-600 px-1">
+          <div className={`flex flex-wrap items-center gap-4 ${isCompact ? 'text-[10.5px] pt-0.5' : 'text-[11px]'} text-slate-600 px-1`}>
             {data.customFields
               .filter((cf) => cf.label?.trim() && cf.value?.trim())
               .map((cf) => (

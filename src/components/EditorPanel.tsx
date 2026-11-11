@@ -9,7 +9,7 @@ import {
   StudentInfo,
   CustomField,
 } from '../types/coverPage';
-import { SEMESTER_EXAMPLES, SAMPLE_PROJECTS } from '../config/constants';
+import { SEMESTER_EXAMPLES, SAMPLE_PROJECTS, getDefaultSemester } from '../config/constants';
 import {
   BookOpen,
   Users,
@@ -57,8 +57,9 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
     });
   };
 
-  // Student management
+  // Student management (capped at maximum 6 students)
   const addStudent = () => {
+    if (data.students.length >= 6) return;
     const newStudent: StudentInfo = {
       id: `student-${Date.now()}`,
       name: '',
@@ -109,7 +110,7 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
     (data.students[0].name?.trim().length ?? 0) > 0;
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200/90 shadow-xs flex flex-col h-full overflow-hidden">
+    <div className="no-print bg-white rounded-2xl border border-slate-200/90 shadow-xs flex flex-col h-full overflow-hidden">
       {/* Step Header */}
       <div className="px-5 py-4 bg-slate-50/80 border-b border-slate-200 flex items-center justify-between">
         <div>
@@ -227,13 +228,13 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
                 <label className="block text-xs sm:text-sm font-bold text-slate-900">
                   Semester <span className="text-blue-700">*</span>
                 </label>
-                <span className="text-xs text-slate-400">e.g. Fall 26</span>
+                <span className="text-xs text-slate-400">e.g. {getDefaultSemester()}</span>
               </div>
               <input
                 type="text"
                 value={data.semester}
                 onChange={(e) => updateField('semester', e.target.value)}
-                placeholder="Fall 26"
+                placeholder={getDefaultSemester()}
                 className="w-full h-11 px-3.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-600/30 focus:border-blue-600 font-semibold text-slate-900 text-base sm:text-sm"
               />
               {/* Quick Pick suggestions */}
@@ -292,19 +293,27 @@ export const EditorPanel: React.FC<EditorPanelProps> = ({
 
             {/* Student Contributors */}
             <div className="space-y-3 pt-2 border-t border-slate-200">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between gap-2">
                 <div>
                   <h3 className="text-sm font-bold text-slate-900">Student Contributors</h3>
                   <p className="text-xs text-slate-500">Supports single and group assignment submissions.</p>
                 </div>
-                <button
-                  type="button"
-                  onClick={addStudent}
-                  className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-900 rounded-xl font-bold text-xs border border-blue-200 transition-colors"
-                >
-                  <Plus className="w-4 h-4 text-blue-700" />
-                  Add Member
-                </button>
+                <div className="flex items-center gap-2 shrink-0">
+                  {data.students.length >= 6 && (
+                    <span className="text-[11px] font-semibold text-slate-500 bg-slate-100 px-2 py-1 rounded-md">
+                      Maximum 6 students
+                    </span>
+                  )}
+                  <button
+                    type="button"
+                    onClick={addStudent}
+                    disabled={data.students.length >= 6}
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 disabled:opacity-40 disabled:cursor-not-allowed text-blue-900 rounded-xl font-bold text-xs border border-blue-200 transition-colors"
+                  >
+                    <Plus className="w-4 h-4 text-blue-700" />
+                    Add Member
+                  </button>
+                </div>
               </div>
 
               <div className="space-y-3.5">

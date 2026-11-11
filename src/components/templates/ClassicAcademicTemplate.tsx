@@ -29,8 +29,10 @@ export const ClassicAcademicTemplate: React.FC<TemplateProps> = ({
       ? 'font-serif-classic'
       : 'font-serif-academic';
 
+  const isCompact = data.students.length > 3;
+
   return (
-    <div className="relative w-full h-full bg-white text-slate-900 flex flex-col justify-between p-12 overflow-hidden select-none">
+    <div className={`relative w-full h-full bg-white text-slate-900 flex flex-col justify-between ${isCompact ? 'p-8 px-10' : 'p-12'} overflow-hidden select-none`}>
       {/* CLASSIC FORMAL ACADEMIC DOUBLE-RULE BORDER */}
       <div
         className="absolute inset-5 pointer-events-none border-2"
@@ -134,9 +136,9 @@ export const ClassicAcademicTemplate: React.FC<TemplateProps> = ({
         )}
 
         {/* Main Assignment Title */}
-        <div className="my-2 max-w-[600px] w-full">
+        <div className={`${isCompact ? 'my-1' : 'my-2'} max-w-[600px] w-full`}>
           <h2
-            className={`${fontClass} text-[26px] leading-[1.3] font-bold text-slate-900 tracking-tight text-balance break-words`}
+            className={`${fontClass} ${isCompact ? 'text-[22px] leading-snug' : 'text-[26px] leading-[1.3]'} font-bold text-slate-900 tracking-tight text-balance break-words`}
           >
             {data.assignmentTitle || 'Assignment Topic Title'}
           </h2>
@@ -144,7 +146,7 @@ export const ClassicAcademicTemplate: React.FC<TemplateProps> = ({
 
         {/* Semester Indicator */}
         {visibility.showSemester && data.semester?.trim() && (
-          <div className="mt-2.5 inline-flex items-center gap-2 px-3.5 py-1 rounded-full border border-slate-200 bg-slate-50/70 font-sans-modern">
+          <div className={`${isCompact ? 'mt-1.5 py-0.5' : 'mt-2.5 py-1'} inline-flex items-center gap-2 px-3.5 rounded-full border border-slate-200 bg-slate-50/70 font-sans-modern`}>
             <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: accentColor.primary }} />
             <span className="text-xs uppercase font-medium text-slate-600 tracking-wider">
               Semester: <span className="font-bold text-slate-900">{data.semester}</span>
@@ -154,9 +156,9 @@ export const ClassicAcademicTemplate: React.FC<TemplateProps> = ({
       </div>
 
       {/* BOTTOM FORMAL ACADEMIC SUBMISSION SECTION */}
-      <div className="relative z-10 shrink-0 w-full pt-2">
-        {/* Upper Light-Gray Horizontal Dividers: perfectly aligned on the same horizontal axis with balanced central gap */}
-        <div className="grid grid-cols-2 gap-8 max-w-[650px] mx-auto mb-3">
+      <div className="relative z-10 shrink-0 w-full pt-1">
+        {/* Upper Light-Gray Horizontal Dividers */}
+        <div className={`grid grid-cols-2 gap-8 max-w-[650px] mx-auto ${isCompact ? 'mb-2' : 'mb-3'}`}>
           <div className="h-[1.5px] bg-slate-200 w-full" />
           <div className="h-[1.5px] bg-slate-200 w-full" />
         </div>
@@ -165,30 +167,42 @@ export const ClassicAcademicTemplate: React.FC<TemplateProps> = ({
         <div className="grid grid-cols-2 gap-8 max-w-[650px] mx-auto">
           {/* SUBMITTED BY COLUMN */}
           <div className="flex flex-col text-left">
-            <div className="flex items-center gap-2 mb-3 pb-1 border-b" style={{ borderColor: accentColor.border }}>
+            <div className={`flex items-center gap-2 ${isCompact ? 'mb-2 pb-0.5' : 'mb-3 pb-1'} border-b`} style={{ borderColor: accentColor.border }}>
               <span className="w-2 h-2 rounded-xs" style={{ backgroundColor: accentColor.primary }} />
               <h3
-                className="font-bold uppercase tracking-[0.18em] text-[13px] font-sans-modern leading-normal"
+                className={`font-bold uppercase tracking-[0.18em] ${isCompact ? 'text-[12px]' : 'text-[13px]'} font-sans-modern leading-normal`}
                 style={{ color: accentColor.primary }}
               >
                 Submitted By:
               </h3>
             </div>
 
-            <div className="space-y-3.5">
+            <div className={isCompact ? 'space-y-1.5' : 'space-y-3.5'}>
               {data.students.map((student, idx) => (
-                <div key={student.id || idx} className="space-y-1">
-                  <p className="font-bold text-slate-900 text-[14.5px]">
+                <div key={student.id || idx} className="space-y-0.5">
+                  <p className={`font-bold text-slate-900 ${isCompact ? 'text-[13px] leading-tight' : 'text-[14.5px]'}`}>
                     {student.name?.trim() || 'Student Name'}
                   </p>
                   {student.studentId?.trim() && (
-                    <p className="text-slate-700 font-mono-code tabular-nums text-[13px]">
+                    <p className={`text-slate-700 font-mono-code tabular-nums ${isCompact ? 'text-[11.5px] leading-tight' : 'text-[13px]'}`}>
                       <span className="text-slate-400 font-sans font-normal">Student ID: </span>
                       <span className="font-semibold text-slate-800">{student.studentId}</span>
+                      {isCompact && visibility.showSection && student.section?.trim() && (
+                        <span className="ml-2 pl-2 border-l border-slate-200">
+                          <span className="text-slate-400 font-sans font-normal">Sec: </span>
+                          <span className="font-medium text-slate-700 font-sans">{student.section}</span>
+                        </span>
+                      )}
                     </p>
                   )}
-                  {visibility.showSection && student.section?.trim() && (
+                  {!isCompact && visibility.showSection && student.section?.trim() && (
                     <p className="text-slate-600 text-[13px]">
+                      <span className="text-slate-400 font-sans font-normal">Section: </span>
+                      <span className="font-medium">{student.section}</span>
+                    </p>
+                  )}
+                  {isCompact && !student.studentId?.trim() && visibility.showSection && student.section?.trim() && (
+                    <p className="text-slate-600 text-[11.5px] leading-tight">
                       <span className="text-slate-400 font-sans font-normal">Section: </span>
                       <span className="font-medium">{student.section}</span>
                     </p>
@@ -200,27 +214,27 @@ export const ClassicAcademicTemplate: React.FC<TemplateProps> = ({
 
           {/* SUBMITTED TO COLUMN */}
           <div className="flex flex-col text-left">
-            <div className="flex items-center gap-2 mb-3 pb-1 border-b" style={{ borderColor: accentColor.border }}>
+            <div className={`flex items-center gap-2 ${isCompact ? 'mb-2 pb-0.5' : 'mb-3 pb-1'} border-b`} style={{ borderColor: accentColor.border }}>
               <span className="w-2 h-2 rounded-xs" style={{ backgroundColor: accentColor.primary }} />
               <h3
-                className="font-bold uppercase tracking-[0.18em] text-[13px] font-sans-modern leading-normal"
+                className={`font-bold uppercase tracking-[0.18em] ${isCompact ? 'text-[12px]' : 'text-[13px]'} font-sans-modern leading-normal`}
                 style={{ color: accentColor.primary }}
               >
                 Submitted To:
               </h3>
             </div>
 
-            <div className="space-y-1">
-              <p className="font-bold text-slate-900 text-[14.5px]">
+            <div className="space-y-0.5">
+              <p className={`font-bold text-slate-900 ${isCompact ? 'text-[13px] leading-tight' : 'text-[14.5px]'}`}>
                 {data.teacherName?.trim() || 'Faculty / Instructor Name'}
               </p>
               {visibility.showTeacherDesignation && data.teacherDesignation?.trim() && (
-                <p className="text-slate-700 text-[13px] font-medium leading-snug">
+                <p className={`text-slate-700 ${isCompact ? 'text-[11.5px] leading-tight' : 'text-[13px]'} font-medium leading-snug`}>
                   {data.teacherDesignation}
                 </p>
               )}
               {visibility.showDepartment && data.departmentName?.trim() && (
-                <p className="text-slate-500 text-[12px] leading-tight mt-0.5 font-medium">
+                <p className={`text-slate-500 ${isCompact ? 'text-[11px] leading-tight' : 'text-[12px]'} mt-0.5 font-medium`}>
                   {data.departmentName}
                 </p>
               )}
@@ -230,7 +244,7 @@ export const ClassicAcademicTemplate: React.FC<TemplateProps> = ({
 
         {/* Custom Fields Footnote */}
         {visibility.showCustomFields && data.customFields && data.customFields.length > 0 && (
-          <div className="mt-4 max-w-[650px] mx-auto pt-2.5 border-t border-slate-100 flex flex-wrap items-center justify-center gap-5 text-[11px] text-slate-600">
+          <div className={`${isCompact ? 'mt-2 pt-1.5' : 'mt-4 pt-2.5'} max-w-[650px] mx-auto border-t border-slate-100 flex flex-wrap items-center justify-center gap-4 text-[10.5px] text-slate-600`}>
             {data.customFields
               .filter((cf) => cf.label?.trim() && cf.value?.trim())
               .map((cf) => (
@@ -244,7 +258,7 @@ export const ClassicAcademicTemplate: React.FC<TemplateProps> = ({
 
         {/* Bottom Submission Date */}
         {visibility.showDate && data.submissionDate?.trim() && (
-          <div className="mt-4 pt-2.5 text-center text-[11px] tracking-wide text-slate-600 font-sans-modern border-t border-slate-200">
+          <div className={`${isCompact ? 'mt-2 pt-1.5' : 'mt-4 pt-2.5'} text-center text-[11px] tracking-wide text-slate-600 font-sans-modern border-t border-slate-200`}>
             <span>Date of Submission: </span>
             <span className="font-bold text-slate-900">{data.submissionDate}</span>
           </div>

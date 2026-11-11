@@ -61,7 +61,7 @@ export const TemplateGalleryStep: React.FC<TemplateGalleryStepProps> = ({
   return (
     <div className="space-y-6 pb-24 lg:pb-0 animate-in fade-in duration-200">
       {/* Review Summary Bar */}
-      <div className="bg-white rounded-2xl border border-blue-200/80 p-4 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className="no-print bg-white rounded-2xl border border-blue-200/80 p-4 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="space-y-0.5">
           <div className="flex items-center gap-2 flex-wrap">
             <span className="text-xs font-bold text-blue-900 bg-blue-100/70 border border-blue-200/60 px-2.5 py-0.5 rounded-full">
@@ -99,7 +99,7 @@ export const TemplateGalleryStep: React.FC<TemplateGalleryStepProps> = ({
       {/* Main Grid: Left Template Gallery & Customization, Right Preview */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Left Column: 6 Template Gallery & Styling Controls */}
-        <div className="lg:col-span-5 space-y-5">
+        <div className="no-print lg:col-span-5 space-y-5">
           <div className="bg-white rounded-2xl border border-slate-200/90 p-4 sm:p-5 shadow-xs space-y-4">
             <div className="flex items-center justify-between">
               <div>
@@ -399,7 +399,7 @@ export const TemplateGalleryStep: React.FC<TemplateGalleryStepProps> = ({
       </div>
 
       {/* Mobile Sticky Bottom Action Bar (Fixed, respects safe area) */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 p-3 pb-safe shadow-lg">
+      <div className="no-print lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 p-3 pb-safe shadow-lg">
         <div className="max-w-md mx-auto grid grid-cols-2 gap-2.5">
           <button
             type="button"

@@ -186,6 +186,7 @@ export default function App() {
 
             {/* Offscreen Target for Export Pre-caching when on step 1 or 2 */}
             <div
+              className="no-print"
               style={{ position: 'fixed', left: '-99999px', top: '0', pointerEvents: 'none', opacity: 0 }}
               aria-hidden="true"
             >

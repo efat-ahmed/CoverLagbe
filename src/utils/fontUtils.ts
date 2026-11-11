@@ -6,12 +6,35 @@
 /**
  * Font Utilities for CoverLagbe?
  * Ensures font loading readiness and compiles base64-embedded @font-face CSS
- * so that SVG <foreignObject> rasterization in html-to-image receives exact
- * typographic glyphs without fallback font substitutions.
+ * from self-hosted local woff2 files (/fonts/*.woff2) so that SVG <foreignObject>
+ * rasterization in html-to-image receives exact typographic glyphs without
+ * network timeout races or fallback font substitutions.
  */
 
-const GOOGLE_FONTS_CSS_URL =
-  'https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=JetBrains+Mono:wght@500;600&family=Merriweather:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap';
+export interface LocalFontSpec {
+  family: string;
+  style: 'normal' | 'italic';
+  weight: string;
+  file: string;
+}
+
+export const LOCAL_FONTS: LocalFontSpec[] = [
+  { family: 'Cinzel', style: 'normal', weight: '600', file: 'cinzel-normal-600.woff2' },
+  { family: 'Cinzel', style: 'normal', weight: '700', file: 'cinzel-normal-700.woff2' },
+  { family: 'JetBrains Mono', style: 'normal', weight: '500', file: 'jetbrains-mono-normal-500.woff2' },
+  { family: 'JetBrains Mono', style: 'normal', weight: '600', file: 'jetbrains-mono-normal-600.woff2' },
+  { family: 'Merriweather', style: 'normal', weight: '400', file: 'merriweather-normal-400.woff2' },
+  { family: 'Merriweather', style: 'normal', weight: '700', file: 'merriweather-normal-700.woff2' },
+  { family: 'Merriweather', style: 'italic', weight: '400', file: 'merriweather-italic-400.woff2' },
+  { family: 'Playfair Display', style: 'normal', weight: '600', file: 'playfair-display-normal-600.woff2' },
+  { family: 'Playfair Display', style: 'normal', weight: '700', file: 'playfair-display-normal-700.woff2' },
+  { family: 'Playfair Display', style: 'italic', weight: '600', file: 'playfair-display-italic-600.woff2' },
+  { family: 'Plus Jakarta Sans', style: 'normal', weight: '400', file: 'plus-jakarta-sans-normal-400.woff2' },
+  { family: 'Plus Jakarta Sans', style: 'normal', weight: '500', file: 'plus-jakarta-sans-normal-500.woff2' },
+  { family: 'Plus Jakarta Sans', style: 'normal', weight: '600', file: 'plus-jakarta-sans-normal-600.woff2' },
+  { family: 'Plus Jakarta Sans', style: 'normal', weight: '700', file: 'plus-jakarta-sans-normal-700.woff2' },
+  { family: 'Plus Jakarta Sans', style: 'normal', weight: '800', file: 'plus-jakarta-sans-normal-800.woff2' },
+];
 
 let cachedFontEmbedCSS: string | null = null;
 let fontFetchPromise: Promise<string> | null = null;
@@ -30,11 +53,11 @@ export async function waitForDocumentFonts(): Promise<void> {
 }
 
 /**
- * Fetches Google Fonts stylesheet and converts latin woff2 font files
- * to base64 data URLs for embedding directly into SVG <foreignObject>.
+ * Converts local woff2 font files to base64 data URLs for embedding directly into SVG <foreignObject>.
  * Caches the compiled CSS in memory for instantaneous subsequent exports.
+ * If fetch fails or times out, resets promise so subsequent exports can retry.
  */
-export async function getEmbeddedFontCSS(timeoutMs = 4000): Promise<string> {
+export async function getEmbeddedFontCSS(timeoutMs = 5000): Promise<string> {
   if (cachedFontEmbedCSS) {
     return cachedFontEmbedCSS;
   }
@@ -43,85 +66,54 @@ export async function getEmbeddedFontCSS(timeoutMs = 4000): Promise<string> {
     return fontFetchPromise;
   }
 
-  const fetchTask = async (): Promise<string> => {
+  const buildTask = async (): Promise<string> => {
     try {
-      // 1. Fetch Google Fonts CSS
-      const cssResponse = await fetch(GOOGLE_FONTS_CSS_URL);
-      if (!cssResponse.ok) {
-        throw new Error(`Failed to fetch font CSS: ${cssResponse.statusText}`);
-      }
-      const cssText = await cssResponse.text();
-
-      // 2. Parse latin font-face blocks
-      const latinBlocks = cssText
-        .split('/* latin */')
-        .slice(1)
-        .map((block) => {
-          const ruleContent = block.split('}')[0];
-          return `@font-face { ${ruleContent.trim()} }`;
-        });
-
-      if (latinBlocks.length === 0) {
-        cachedFontEmbedCSS = cssText;
-        return cssText;
-      }
-
-      // 3. Extract unique font URLs and fetch each woff2 as base64
-      const fontUrlMap = new Map<string, string>();
-      const urlRegex = /url\((https:[^)]+\.woff2)\)/g;
-
-      const urlsToFetch = new Set<string>();
-      for (const rule of latinBlocks) {
-        let match;
-        while ((match = urlRegex.exec(rule)) !== null) {
-          urlsToFetch.add(match[1]);
-        }
-      }
-
-      // Fetch all unique latin woff2 fonts in parallel
-      await Promise.all(
-        Array.from(urlsToFetch).map(async (url) => {
-          try {
-            const fontRes = await fetch(url);
-            if (!fontRes.ok) return;
-            const blob = await fontRes.blob();
-            const base64Data = await new Promise<string>((resolve, reject) => {
-              const reader = new FileReader();
-              reader.onloadend = () => resolve(reader.result as string);
-              reader.onerror = reject;
-              reader.readAsDataURL(blob);
-            });
-            fontUrlMap.set(url, base64Data);
-          } catch (err) {
-            console.warn(`Could not base64 encode font: ${url}`, err);
+      const fontRules = await Promise.all(
+        LOCAL_FONTS.map(async (f) => {
+          const fontUrl = `/fonts/${f.file}`;
+          const res = await fetch(fontUrl);
+          if (!res.ok) {
+            throw new Error(`Failed to load local font ${f.file}: ${res.statusText}`);
           }
+          const blob = await res.blob();
+          const base64Data = await new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result as string);
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+          });
+
+          return `@font-face {\n  font-family: '${f.family}';\n  font-style: ${f.style};\n  font-weight: ${f.weight};\n  src: url("${base64Data}") format('woff2');\n}`;
         })
       );
 
-      // 4. Replace font URLs with base64 data URLs in each rule
-      const embeddedRules = latinBlocks.map((rule) => {
-        return rule.replace(/url\((https:[^)]+\.woff2)\)/g, (fullMatch, fontUrl) => {
-          const dataUrl = fontUrlMap.get(fontUrl);
-          return dataUrl ? `url("${dataUrl}")` : fullMatch;
-        });
-      });
-
-      cachedFontEmbedCSS = embeddedRules.join('\n\n');
-      return cachedFontEmbedCSS;
+      const compiledCSS = fontRules.join('\n\n');
+      cachedFontEmbedCSS = compiledCSS;
+      return compiledCSS;
     } catch (error) {
-      console.warn('Failed to compile embedded fonts CSS, falling back gracefully:', error);
+      console.warn('Failed to compile embedded fonts CSS, will retry on next export:', error);
+      // Reset fontFetchPromise so subsequent export can retry instead of being stuck with empty string
+      fontFetchPromise = null;
       return '';
     }
   };
 
-  // Run with safety timeout so slow networks do not freeze export
   const timeoutPromise = new Promise<string>((resolve) => {
     setTimeout(() => {
-      resolve(cachedFontEmbedCSS || '');
+      // Timeout reached: do not permanently cache empty string
+      fontFetchPromise = null;
+      resolve('');
     }, timeoutMs);
   });
 
-  fontFetchPromise = Promise.race([fetchTask(), timeoutPromise]);
+  fontFetchPromise = Promise.race([buildTask(), timeoutPromise]).then((res) => {
+    if (!res) {
+      // Reset if resolved to empty string so next export can retry
+      fontFetchPromise = null;
+    }
+    return res;
+  });
+
   return fontFetchPromise;
 }
 

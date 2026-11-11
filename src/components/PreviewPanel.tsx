@@ -87,7 +87,7 @@ export const PreviewPanel: React.FC<PreviewPanelProps> = ({
     >
       {/* Top Preview Control Bar */}
       <div
-        className={`px-4 py-2.5 bg-white border-b border-slate-200 flex items-center justify-between gap-3 flex-wrap ${
+        className={`no-print px-4 py-2.5 bg-white border-b border-slate-200 flex items-center justify-between gap-3 flex-wrap ${
           isFullscreen ? 'rounded-xl shadow-lg mb-4' : ''
         }`}
       >

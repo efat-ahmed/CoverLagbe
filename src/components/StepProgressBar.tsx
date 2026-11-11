@@ -39,7 +39,7 @@ export const StepProgressBar: React.FC<StepProgressBarProps> = ({
   ];
 
   return (
-    <div className="w-full bg-white border-b border-slate-200/90 py-3 px-4 sm:px-6 shadow-2xs">
+    <div className="no-print w-full bg-white border-b border-slate-200/90 py-3 px-4 sm:px-6 shadow-2xs">
       <div className="max-w-5xl mx-auto">
         {/* Mobile Compact Progress Bar */}
         <div className="block sm:hidden">

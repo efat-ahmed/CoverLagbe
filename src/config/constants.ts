@@ -14,12 +14,58 @@ export const DEFAULT_UNIVERSITY_LOGO = '/university-logo.svg';
 export const INSTITUTION_LOGO_STORAGE_KEY = 'covercraft_institutional_logo_v1';
 export const INSTITUTION_LOGO_CONFIGURED_KEY = 'covercraft_logo_is_configured';
 
-export const SEMESTER_EXAMPLES = [
-  'Fall 26',
-  'Spring 27',
-  'Summer 27',
-  'Fall 27',
-];
+/**
+ * Generates default formatted submission date (e.g. "November 11, 2026").
+ */
+export function getDefaultSubmissionDate(date = new Date()): string {
+  return date.toLocaleDateString('en-US', {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+  });
+}
+
+/**
+ * Generates semester from month:
+ * Jan–Apr = Spring, May–Aug = Summer, Sep–Dec = Fall, plus 2-digit year (e.g. "Fall 26").
+ */
+export function getDefaultSemester(date = new Date()): string {
+  const month = date.getMonth(); // 0 = Jan, 11 = Dec
+  const year2 = String(date.getFullYear()).slice(-2);
+  let term = 'Fall';
+  if (month >= 0 && month <= 3) {
+    term = 'Spring';
+  } else if (month >= 4 && month <= 7) {
+    term = 'Summer';
+  } else {
+    term = 'Fall';
+  }
+  return `${term} ${year2}`;
+}
+
+/**
+ * Generates dynamic semester examples as current semester + next 3.
+ */
+export function getDynamicSemesterExamples(count = 4, startDate = new Date()): string[] {
+  const terms = ['Spring', 'Summer', 'Fall'];
+  const month = startDate.getMonth();
+  let termIdx = month <= 3 ? 0 : month <= 7 ? 1 : 2;
+  let year = startDate.getFullYear();
+
+  const results: string[] = [];
+  for (let i = 0; i < count; i++) {
+    const yr2 = String(year).slice(-2);
+    results.push(`${terms[termIdx]} ${yr2}`);
+    termIdx++;
+    if (termIdx >= 3) {
+      termIdx = 0;
+      year++;
+    }
+  }
+  return results;
+}
+
+export const SEMESTER_EXAMPLES = getDynamicSemesterExamples();
 
 export const TEMPLATE_METADATA: {
   id: TemplateId;
@@ -129,18 +175,18 @@ export const INITIAL_COVER_PAGE_DATA: CoverPageData = {
   assignmentNumber: 'Assignment 02',
   courseTitle: 'Data Structures and Algorithms',
   courseCode: 'CSE220',
-  semester: 'Fall 26',
+  semester: getDefaultSemester(),
   students: [
     {
       id: 'student-1',
-      name: 'Abrar Rahman',
-      studentId: '22301045',
-      section: '04',
+      name: '',
+      studentId: '',
+      section: '',
     },
   ],
-  teacherName: 'Dr. Sadia Hamid Kazi',
+  teacherName: 'Dr. Example Teacher',
   teacherDesignation: 'Associate Professor & Chairperson',
-  submissionDate: 'November 15, 2026',
+  submissionDate: getDefaultSubmissionDate(),
   customFields: [
     {
       id: 'cf-1',
@@ -183,7 +229,7 @@ export const SAMPLE_PROJECTS: Record<string, Partial<CoverPageData>> = {
         section: '04',
       },
     ],
-    teacherName: 'Dr. Sadia Hamid Kazi',
+    teacherName: 'Dr. Example Teacher',
     teacherDesignation: 'Associate Professor & Chairperson',
     submissionDate: 'November 15, 2026',
     template: 'modern-blue',
@@ -217,7 +263,7 @@ export const SAMPLE_PROJECTS: Record<string, Partial<CoverPageData>> = {
         section: '01',
       },
     ],
-    teacherName: 'Prof. Dr. A. K. M. Abdul Malek',
+    teacherName: 'Prof. Dr. Example Teacher',
     teacherDesignation: 'Professor, EEE',
     submissionDate: 'April 18, 2027',
     template: 'premium-formal',
@@ -239,7 +285,7 @@ export const SAMPLE_PROJECTS: Record<string, Partial<CoverPageData>> = {
         section: '02',
       },
     ],
-    teacherName: 'Dr. Mohammad Mujibul Haque',
+    teacherName: 'Dr. Example Professor',
     teacherDesignation: 'Associate Professor of Economics',
     submissionDate: 'August 24, 2027',
     template: 'editorial-style',

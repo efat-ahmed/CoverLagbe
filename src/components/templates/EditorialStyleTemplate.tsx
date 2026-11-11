@@ -29,8 +29,10 @@ export const EditorialStyleTemplate: React.FC<TemplateProps> = ({
       ? 'font-serif-classic'
       : 'font-serif-academic';
 
+  const isCompact = data.students.length > 3;
+
   return (
-    <div className="relative w-full h-full bg-white text-slate-900 flex flex-col justify-between p-12 overflow-hidden select-none">
+    <div className={`relative w-full h-full bg-white text-slate-900 flex flex-col justify-between ${isCompact ? 'p-8 px-10' : 'p-12'} overflow-hidden select-none`}>
       {/* Editorial Top Lockup */}
       <div className="shrink-0 w-full border-b-2 pb-5" style={{ borderColor: accentColor.primary }}>
         <div className="flex items-center justify-between gap-6">
@@ -101,7 +103,7 @@ export const EditorialStyleTemplate: React.FC<TemplateProps> = ({
           )}
 
           <h2
-            className={`${fontClass} text-[30px] leading-[1.25] font-bold text-slate-900 tracking-tight text-balance break-words`}
+            className={`${fontClass} ${isCompact ? 'text-[24px] leading-[1.25]' : 'text-[30px] leading-[1.25]'} font-bold text-slate-900 tracking-tight text-balance break-words`}
           >
             {data.assignmentTitle || 'Assignment Title'}
           </h2>
@@ -109,31 +111,42 @@ export const EditorialStyleTemplate: React.FC<TemplateProps> = ({
       </div>
 
       {/* BOTTOM: Editorial Metadata Grid */}
-      <div className="shrink-0 w-full space-y-4 pt-6 border-t border-slate-200">
+      <div className={`shrink-0 w-full ${isCompact ? 'space-y-2 pt-3' : 'space-y-4 pt-6'} border-t border-slate-200`}>
         <div className="grid grid-cols-2 gap-6 text-xs">
           {/* Author / Student column */}
-          <div className="space-y-3">
+          <div className={isCompact ? 'space-y-1.5' : 'space-y-3'}>
             <p
-              className="text-[12px] font-bold uppercase tracking-widest font-sans-modern"
+              className={`text-[12px] font-bold uppercase tracking-widest font-sans-modern ${isCompact ? 'mb-1' : ''}`}
               style={{ color: accentColor.primary }}
             >
               Author / Student Details
             </p>
 
-            <div className="space-y-3">
+            <div className={isCompact ? 'space-y-1.5' : 'space-y-3'}>
               {data.students.map((student, idx) => (
                 <div key={student.id || idx} className="space-y-0.5">
-                  <p className="font-bold text-slate-900 text-[14.5px]">
+                  <p className={`font-bold text-slate-900 ${isCompact ? 'text-[13px] leading-tight' : 'text-[14.5px]'}`}>
                     {student.name?.trim() || 'Student Name'}
                   </p>
                   {student.studentId?.trim() && (
-                    <p className="font-mono-code text-[13px] text-slate-600">
+                    <p className={`font-mono-code ${isCompact ? 'text-[11.5px] leading-tight' : 'text-[13px]'} text-slate-600`}>
                       <span className="text-slate-400 font-sans">ID: </span>
                       {student.studentId}
+                      {isCompact && visibility.showSection && student.section?.trim() && (
+                        <span className="ml-2 pl-2 border-l border-slate-200">
+                          <span className="text-slate-400 font-sans">Sec: </span>
+                          <span className="text-slate-600 font-sans">{student.section}</span>
+                        </span>
+                      )}
                     </p>
                   )}
-                  {visibility.showSection && student.section?.trim() && (
+                  {!isCompact && visibility.showSection && student.section?.trim() && (
                     <p className="text-[13px] text-slate-500">
+                      <span>Section: {student.section}</span>
+                    </p>
+                  )}
+                  {isCompact && !student.studentId?.trim() && visibility.showSection && student.section?.trim() && (
+                    <p className="text-[11.5px] text-slate-500 leading-tight">
                       <span>Section: {student.section}</span>
                     </p>
                   )}
@@ -146,24 +159,24 @@ export const EditorialStyleTemplate: React.FC<TemplateProps> = ({
           <div className="space-y-2 flex flex-col justify-between">
             <div>
               <p
-                className="text-[12px] font-bold uppercase tracking-widest font-sans-modern"
+                className={`text-[12px] font-bold uppercase tracking-widest font-sans-modern ${isCompact ? 'mb-1' : ''}`}
                 style={{ color: accentColor.primary }}
               >
                 Submitted To
               </p>
-              <p className="font-bold text-slate-900 text-[14.5px] mt-1">
+              <p className={`font-bold text-slate-900 ${isCompact ? 'text-[13px] leading-tight' : 'text-[14.5px]'} mt-1`}>
                 {data.teacherName?.trim() || 'Faculty Name'}
               </p>
               {visibility.showTeacherDesignation && data.teacherDesignation?.trim() && (
-                <p className="text-slate-600 text-[13px] mt-0.5">{data.teacherDesignation}</p>
+                <p className={`text-slate-600 ${isCompact ? 'text-[11.5px] leading-tight' : 'text-[13px]'} mt-0.5`}>{data.teacherDesignation}</p>
               )}
               {visibility.showDepartment && data.departmentName?.trim() && (
-                <p className="text-slate-500 text-[12px] mt-0.5">{data.departmentName}</p>
+                <p className={`text-slate-500 ${isCompact ? 'text-[11px] leading-tight' : 'text-[12px]'} mt-0.5`}>{data.departmentName}</p>
               )}
             </div>
 
             {visibility.showDate && data.submissionDate?.trim() && (
-              <div className="pt-3 border-t border-slate-100 text-[11px] text-slate-600">
+              <div className={`${isCompact ? 'pt-1.5 mt-1' : 'pt-3'} border-t border-slate-100 text-[11px] text-slate-600`}>
                 <span className="text-slate-400">Date of Submission: </span>
                 <span className="font-semibold text-slate-900">{data.submissionDate}</span>
               </div>
@@ -173,7 +186,7 @@ export const EditorialStyleTemplate: React.FC<TemplateProps> = ({
 
         {/* Custom fields */}
         {visibility.showCustomFields && data.customFields && data.customFields.length > 0 && (
-          <div className="flex flex-wrap gap-4 pt-2 text-[11px] text-slate-600 border-t border-slate-100">
+          <div className={`flex flex-wrap gap-4 ${isCompact ? 'pt-1.5 text-[10.5px]' : 'pt-2 text-[11px]'} text-slate-600 border-t border-slate-100`}>
             {data.customFields
               .filter((cf) => cf.label?.trim() && cf.value?.trim())
               .map((cf) => (

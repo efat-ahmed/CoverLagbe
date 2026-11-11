@@ -3,9 +3,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { CoverPageData, TemplateId } from '../types/coverPage';
-import { INITIAL_COVER_PAGE_DATA } from '../config/constants';
+import { CoverPageData, StudentInfo, TemplateId } from '../types/coverPage';
+import { getDefaultSemester, INITIAL_COVER_PAGE_DATA } from '../config/constants';
 
+// Note: Do NOT rename covercraft_* keys to preserve existing users' saved drafts in localStorage.
 const DRAFT_STORAGE_KEY = 'covercraft_assignment_draft_v3';
 const DRAFT_SAVED_AT_KEY = 'covercraft_draft_saved_at_v3';
 
@@ -61,9 +62,9 @@ export function loadSavedDraft(): { data: CoverPageData | null; savedAt: string 
       validAccentId = 'brac-blue';
     }
 
-    // Clean students list: remove any batch or regNo properties
+    // Clean students list: remove any legacy batch or regNo properties
     const cleanStudents = (Array.isArray(parsed.students) ? parsed.students : INITIAL_COVER_PAGE_DATA.students).map(
-      (s: any, idx: number) => ({
+      (s: Partial<StudentInfo> & Record<string, unknown>, idx: number) => ({
         id: s.id || `student-${idx + 1}`,
         name: s.name || '',
         studentId: s.studentId || '',
@@ -77,7 +78,7 @@ export function loadSavedDraft(): { data: CoverPageData | null; savedAt: string 
         ...parsed,
         template: validTemplate,
         accentColorId: validAccentId,
-        semester: parsed.semester || 'Fall 26',
+        semester: parsed.semester || getDefaultSemester(),
         students: cleanStudents,
         visibility: {
           ...INITIAL_COVER_PAGE_DATA.visibility,

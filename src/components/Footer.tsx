@@ -7,7 +7,7 @@ import React from 'react';
 
 export const Footer: React.FC = () => {
   return (
-    <footer className="w-full bg-blue-900 border-t border-blue-950 mt-auto text-white shadow-inner">
+    <footer className="no-print w-full bg-blue-900 border-t border-blue-950 mt-auto text-white shadow-inner">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 flex flex-col sm:flex-row items-center justify-between gap-4">
         {/* Left: Copyright */}
         <p className="text-sm font-medium text-white text-center sm:text-left order-2 sm:order-1 tracking-wide">

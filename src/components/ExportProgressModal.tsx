@@ -46,6 +46,12 @@ export const ExportProgressModal: React.FC<ExportProgressModalProps> = ({
             </div>
             <h3 className="text-base font-bold text-slate-900">Export Complete</h3>
             <p className="text-xs text-slate-600 mt-1">{progress.message}</p>
+            {progress.warning && (
+              <div className="mt-3 p-2.5 bg-amber-50 border border-amber-200/90 rounded-xl text-left flex items-start gap-2 text-amber-800">
+                <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                <p className="text-[11px] leading-snug">{progress.warning}</p>
+              </div>
+            )}
             <button
               onClick={onClose}
               className="mt-4 px-5 py-2 text-xs font-semibold text-white bg-slate-900 hover:bg-slate-800 rounded-xl transition-colors shadow-xs"

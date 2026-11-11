@@ -29,8 +29,10 @@ export const GeometricBlueTemplate: React.FC<TemplateProps> = ({
       ? 'font-serif-classic'
       : 'font-sans-modern';
 
+  const isCompact = data.students.length > 3;
+
   return (
-    <div className="relative w-full h-full bg-white text-slate-900 flex flex-col justify-between p-12 overflow-hidden select-none">
+    <div className={`relative w-full h-full bg-white text-slate-900 flex flex-col justify-between ${isCompact ? 'p-8 px-10' : 'p-12'} overflow-hidden select-none`}>
       {/* GEOMETRIC BLUE ACCENTS */}
       {/* Top right geometric polygon */}
       <div
@@ -120,13 +122,13 @@ export const GeometricBlueTemplate: React.FC<TemplateProps> = ({
           </div>
 
           <h2
-            className={`${fontClass} text-[28px] leading-[1.28] font-extrabold text-slate-900 tracking-tight text-balance break-words`}
+            className={`${fontClass} ${isCompact ? 'text-[24px] leading-[1.25]' : 'text-[28px] leading-[1.28]'} font-extrabold text-slate-900 tracking-tight text-balance break-words`}
           >
             {data.assignmentTitle || 'Assignment Title'}
           </h2>
 
           {data.courseTitle?.trim() && (
-            <p className="text-sm font-semibold text-slate-600 mt-3 font-sans-modern">
+            <p className={`text-sm font-semibold text-slate-600 ${isCompact ? 'mt-1.5' : 'mt-3'} font-sans-modern`}>
               Course: {data.courseTitle}
             </p>
           )}
@@ -134,11 +136,11 @@ export const GeometricBlueTemplate: React.FC<TemplateProps> = ({
       </div>
 
       {/* BOTTOM SECTION: Symmetrical Stylized Cards */}
-      <div className="relative z-10 shrink-0 w-full space-y-4 pt-4 border-t border-slate-100">
-        <div className="grid grid-cols-2 gap-5">
+      <div className={`relative z-10 shrink-0 w-full ${isCompact ? 'space-y-2 pt-2' : 'space-y-4 pt-4'} border-t border-slate-100`}>
+        <div className={`grid grid-cols-2 ${isCompact ? 'gap-4' : 'gap-5'}`}>
           {/* Student details */}
-          <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-2xs">
-            <div className="flex items-center gap-2 mb-3">
+          <div className={`${isCompact ? 'p-3' : 'p-4'} rounded-xl border border-slate-200 bg-white shadow-2xs`}>
+            <div className={`flex items-center gap-2 ${isCompact ? 'mb-1.5' : 'mb-3'}`}>
               <div
                 className="w-1.5 h-3.5 rounded-full shrink-0"
                 style={{ backgroundColor: accentColor.primary }}
@@ -151,20 +153,31 @@ export const GeometricBlueTemplate: React.FC<TemplateProps> = ({
               </span>
             </div>
 
-            <div className="space-y-3">
+            <div className={isCompact ? 'space-y-1.5' : 'space-y-3'}>
               {data.students.map((student, idx) => (
                 <div key={student.id || idx} className="space-y-0.5">
-                  <p className="font-bold text-slate-900 text-[14.5px]">
+                  <p className={`font-bold text-slate-900 ${isCompact ? 'text-[13px] leading-tight' : 'text-[14.5px]'}`}>
                     {student.name?.trim() || 'Student Name'}
                   </p>
                   {student.studentId?.trim() && (
-                    <p className="font-mono-code tabular-nums text-[13px] text-slate-600">
+                    <p className={`font-mono-code tabular-nums ${isCompact ? 'text-[11.5px] leading-tight' : 'text-[13px]'} text-slate-600`}>
                       <span className="text-slate-400 font-sans">ID: </span>
                       {student.studentId}
+                      {isCompact && visibility.showSection && student.section?.trim() && (
+                        <span className="ml-2 pl-2 border-l border-slate-200">
+                          <span className="text-slate-400 font-sans">Sec: </span>
+                          <span className="text-slate-600 font-sans">{student.section}</span>
+                        </span>
+                      )}
                     </p>
                   )}
-                  {visibility.showSection && student.section?.trim() && (
+                  {!isCompact && visibility.showSection && student.section?.trim() && (
                     <p className="text-[13px] text-slate-500 pt-0.5">
+                      <span>Section: {student.section}</span>
+                    </p>
+                  )}
+                  {isCompact && !student.studentId?.trim() && visibility.showSection && student.section?.trim() && (
+                    <p className="text-[11.5px] text-slate-500 leading-tight">
                       <span>Section: {student.section}</span>
                     </p>
                   )}
@@ -174,9 +187,9 @@ export const GeometricBlueTemplate: React.FC<TemplateProps> = ({
           </div>
 
           {/* Submission and Instructor Details */}
-          <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-2xs flex flex-col justify-between">
+          <div className={`${isCompact ? 'p-3' : 'p-4'} rounded-xl border border-slate-200 bg-white shadow-2xs flex flex-col justify-between`}>
             <div>
-              <div className="flex items-center gap-2 mb-3">
+              <div className={`flex items-center gap-2 ${isCompact ? 'mb-1.5' : 'mb-3'}`}>
                 <div
                   className="w-1.5 h-3.5 rounded-full shrink-0"
                   style={{ backgroundColor: accentColor.secondary }}
@@ -189,19 +202,19 @@ export const GeometricBlueTemplate: React.FC<TemplateProps> = ({
                 </span>
               </div>
 
-              <p className="font-bold text-slate-900 text-[14.5px]">
+              <p className={`font-bold text-slate-900 ${isCompact ? 'text-[13px] leading-tight' : 'text-[14.5px]'}`}>
                 {data.teacherName?.trim() || 'Faculty Name'}
               </p>
               {visibility.showTeacherDesignation && data.teacherDesignation?.trim() && (
-                <p className="text-slate-600 text-[13px] mt-0.5">{data.teacherDesignation}</p>
+                <p className={`text-slate-600 ${isCompact ? 'text-[11.5px] leading-tight' : 'text-[13px]'} mt-0.5`}>{data.teacherDesignation}</p>
               )}
               {visibility.showDepartment && data.departmentName?.trim() && (
-                <p className="text-slate-500 text-[12px] mt-0.5">{data.departmentName}</p>
+                <p className={`text-slate-500 ${isCompact ? 'text-[11px] leading-tight' : 'text-[12px]'} mt-0.5`}>{data.departmentName}</p>
               )}
             </div>
 
             {visibility.showDate && data.submissionDate?.trim() && (
-              <div className="pt-3 border-t border-slate-100 mt-2 text-[11px] text-slate-600">
+              <div className={`${isCompact ? 'pt-1.5 mt-1.5' : 'pt-3 mt-2'} border-t border-slate-100 text-[11px] text-slate-600`}>
                 <span className="text-slate-400">Submission Date: </span>
                 <span className="font-bold text-slate-900">{data.submissionDate}</span>
               </div>
@@ -211,7 +224,7 @@ export const GeometricBlueTemplate: React.FC<TemplateProps> = ({
 
         {/* Custom fields bar */}
         {visibility.showCustomFields && data.customFields && data.customFields.length > 0 && (
-          <div className="flex flex-wrap items-center justify-between text-[11px] text-slate-600 px-3 py-1.5 bg-slate-50 rounded-lg border border-slate-200">
+          <div className={`flex flex-wrap items-center justify-between ${isCompact ? 'text-[10.5px] px-2.5 py-1' : 'text-[11px] px-3 py-1.5'} text-slate-600 bg-slate-50 rounded-lg border border-slate-200`}>
             {data.customFields
               .filter((cf) => cf.label?.trim() && cf.value?.trim())
               .map((cf) => (

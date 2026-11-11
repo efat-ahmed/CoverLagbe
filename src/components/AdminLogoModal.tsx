@@ -49,15 +49,26 @@ export const AdminLogoModal: React.FC<AdminLogoModalProps> = ({
       return;
     }
 
+    const MAX_SIZE_BYTES = 500 * 1024; // 500 KB limit
+    if (file.size > MAX_SIZE_BYTES) {
+      setUploadFeedback(`File size exceeds 500 KB limit (${(file.size / 1024).toFixed(0)} KB). Please select an image under 500 KB.`);
+      return;
+    }
+
     const reader = new FileReader();
     reader.onload = (event) => {
       const result = event.target?.result as string;
       if (result) {
-        saveInstitutionalLogo(result);
-        const updated = getInstitutionalLogo();
-        setLogoState(updated);
-        setUploadFeedback('Institutional logo successfully updated and applied to all templates!');
-        onLogoUpdated();
+        try {
+          saveInstitutionalLogo(result);
+          const updated = getInstitutionalLogo();
+          setLogoState(updated);
+          setUploadFeedback('Institutional logo successfully updated and applied to all templates!');
+          onLogoUpdated();
+        } catch (err) {
+          console.error('Failed to save logo to localStorage:', err);
+          setUploadFeedback('Browser storage limit exceeded. The image file could not be saved to local storage.');
+        }
       }
     };
     reader.readAsDataURL(file);
@@ -93,7 +104,7 @@ export const AdminLogoModal: React.FC<AdminLogoModalProps> = ({
                 Institutional Logo Configuration
               </h3>
               <p className="text-xs text-slate-300">
-                Admin Setup · Fixed across all student assignment templates
+                Custom Logo · Fixed across all student assignment templates
               </p>
             </div>
           </div>
@@ -204,16 +215,18 @@ export const AdminLogoModal: React.FC<AdminLogoModalProps> = ({
               </button>
             </div>
 
-            {/* Testing state toggle */}
-            <div className="pt-2 border-t border-slate-200">
-              <button
-                type="button"
-                onClick={handleSimulateUnconfigured}
-                className="w-full text-center text-xs text-slate-500 hover:text-amber-800 py-1 transition-colors underline decoration-slate-300"
-              >
-                Test Placeholder: Simulate unconfigured logo state
-              </button>
-            </div>
+            {/* Testing state toggle (only in development) */}
+            {import.meta.env.DEV && (
+              <div className="pt-2 border-t border-slate-200">
+                <button
+                  type="button"
+                  onClick={handleSimulateUnconfigured}
+                  className="w-full text-center text-xs text-slate-500 hover:text-amber-800 py-1 transition-colors underline decoration-slate-300"
+                >
+                  Test Placeholder: Simulate unconfigured logo state
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
