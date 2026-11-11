@@ -2,9 +2,21 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>CoverLagbe? — BRAC University Assignment Cover Page Generator</title>
     <meta name="description" content="CoverLagbe? is the ultimate assignment cover page generator for BRAC University students. Create, customize, and export professional A4 cover pages in seconds." />
+    
+    <!-- Theme & PWA Capabilities -->
+    <meta name="theme-color" content="#2A5CAA" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="CoverLagbe" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+
+    <!-- OpenGraph & Twitter Cards -->
     <meta property="og:title" content="CoverLagbe? — BRAC University Assignment Cover Page Generator" />
     <meta property="og:description" content="CoverLagbe? is the ultimate assignment cover page generator for BRAC University students. Create, customize, and export professional A4 cover pages in seconds." />
     <meta property="og:type" content="website" />
@@ -12,10 +24,25 @@
     <meta property="og:image" content="/og.png" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:image" content="/og.png" />
+
+    <!-- Preload Primary Academic Font Subsets -->
+    <link rel="preload" href="/fonts/plus-jakarta-sans-normal-600.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/playfair-display-normal-700.woff2" as="font" type="font/woff2" crossorigin />
   </head>
-  <body class="bg-slate-50 text-slate-900 antialiased font-sans selection:bg-blue-100 selection:text-blue-900">
-    <div id="root"></div>
+  <body class="bg-slate-50 text-slate-900 antialiased font-sans selection:bg-blue-100 selection:text-blue-900 min-h-dvh">
+    <div id="root">
+      <!-- Lightweight SSR Loading Skeleton preventing layout shift -->
+      <div style="min-height: 100dvh; display: flex; flex-direction: column; background-color: #F8FAFC;">
+        <div style="height: 64px; background: #ffffff; border-bottom: 1px solid #E2E8F0; display: flex; align-items: center; padding: 0 24px;">
+          <div style="width: 36px; height: 36px; border-radius: 12px; background: #2A5CAA; margin-right: 12px;"></div>
+          <div style="width: 140px; height: 20px; background: #E2E8F0; border-radius: 6px;"></div>
+        </div>
+        <div style="flex: 1; max-width: 800px; width: 100%; margin: 24px auto; padding: 0 16px;">
+          <div style="height: 48px; background: #ffffff; border-radius: 16px; border: 1px solid #E2E8F0; margin-bottom: 24px;"></div>
+          <div style="height: 380px; background: #ffffff; border-radius: 20px; border: 1px solid #E2E8F0;"></div>
+        </div>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
-

@@ -14,7 +14,7 @@ interface TemplateProps {
   accentColor: AccentColorConfig;
 }
 
-export const GeometricBlueTemplate: React.FC<TemplateProps> = ({
+export const GeometricBlueTemplate = React.memo<TemplateProps>(({
   data,
   logoUrl,
   isLogoConfigured,
@@ -238,4 +238,6 @@ export const GeometricBlueTemplate: React.FC<TemplateProps> = ({
       </div>
     </div>
   );
-};
+});
+
+GeometricBlueTemplate.displayName = 'GeometricBlueTemplate';

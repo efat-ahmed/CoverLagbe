@@ -14,7 +14,7 @@ interface TemplateProps {
   accentColor: AccentColorConfig;
 }
 
-export const ModernBlueTemplate: React.FC<TemplateProps> = ({
+export const ModernBlueTemplate = React.memo<TemplateProps>(({
   data,
   logoUrl,
   isLogoConfigured,
@@ -231,4 +231,6 @@ export const ModernBlueTemplate: React.FC<TemplateProps> = ({
       </div>
     </div>
   );
-};
+});
+
+ModernBlueTemplate.displayName = 'ModernBlueTemplate';

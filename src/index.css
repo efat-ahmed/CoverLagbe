@@ -123,6 +123,58 @@
   .font-mono-code {
     font-family: 'JetBrains Mono', monospace;
   }
+
+  /* Safe Area Insets for Mobile Notches and Home Indicators */
+  .pb-safe {
+    padding-bottom: max(12px, env(safe-area-inset-bottom, 12px));
+  }
+  .pt-safe {
+    padding-top: max(12px, env(safe-area-inset-top, 12px));
+  }
+  .pl-safe {
+    padding-left: max(16px, env(safe-area-inset-left, 16px));
+  }
+  .pr-safe {
+    padding-right: max(16px, env(safe-area-inset-right, 16px));
+  }
+}
+
+/* Mobile & Viewport System */
+html, body {
+  overflow-x: hidden;
+  max-width: 100vw;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Button & Touch Target Polish */
+button, input, select, textarea, a {
+  touch-action: manipulation;
+}
+
+@media (pointer: coarse) {
+  /* Ensure comfortable touch targets on phone/tablet */
+  button, [role="button"], input[type="button"], input[type="submit"] {
+    min-height: 44px;
+  }
+  /* Smaller inline icon or chip buttons can override if needed */
+  .touch-compact {
+    min-height: 36px;
+  }
+}
+
+/* Modal and Drawer scroll isolation */
+.overscroll-contain {
+  overscroll-behavior: contain;
+}
+
+/* Respect user's motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 /* Print page styles */

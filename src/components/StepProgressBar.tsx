@@ -17,47 +17,84 @@ export const StepProgressBar: React.FC<StepProgressBarProps> = ({
   currentStep,
   onStepClick,
 }) => {
-  const steps: { number: WorkflowStep; title: string; subtitle: string; icon: React.ReactNode }[] = [
+  const steps: {
+    number: WorkflowStep;
+    title: string;
+    mobileTitle: string;
+    subtitle: string;
+    icon: React.ReactNode;
+  }[] = [
     {
       number: 1,
       title: 'University & Course',
+      mobileTitle: 'Course',
       subtitle: 'Basic details',
       icon: <BookOpen className="w-4 h-4" />,
     },
     {
       number: 2,
       title: 'Assignment & Students',
+      mobileTitle: 'Details',
       subtitle: 'Title, IDs & faculty',
       icon: <Users className="w-4 h-4" />,
     },
     {
       number: 3,
       title: 'Template & Download',
+      mobileTitle: 'Export',
       subtitle: 'Choose style & export',
       icon: <Palette className="w-4 h-4" />,
     },
   ];
 
   return (
-    <div className="no-print w-full bg-white border-b border-slate-200/90 py-3 px-4 sm:px-6 shadow-2xs">
+    <div className="no-print w-full bg-white border-b border-slate-200/90 py-2 sm:py-3 px-3 sm:px-6 shadow-2xs">
       <div className="max-w-5xl mx-auto">
-        {/* Mobile Compact Progress Bar */}
+        {/* Mobile Step Bar: Clean 3-segment progress indicator with shortened labels */}
         <div className="block sm:hidden">
           <div className="flex items-center justify-between text-xs font-bold text-slate-900 mb-1.5">
             <span className="text-blue-900 flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-blue-700" />
               Step {currentStep} of 3
             </span>
-            <span className="text-slate-600 font-semibold">
-              {steps[currentStep - 1].title}
+            <span className="text-slate-700 font-semibold text-[11px]">
+              {steps[currentStep - 1].mobileTitle}: {steps[currentStep - 1].subtitle}
             </span>
           </div>
-          {/* Progress bar line */}
-          <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
-            <div
-              className="bg-blue-700 h-full rounded-full transition-all duration-300"
-              style={{ width: `${(currentStep / 3) * 100}%` }}
-            />
+
+          {/* 3 Clickable segmented progress bars */}
+          <div className="grid grid-cols-3 gap-1.5">
+            {steps.map((s) => {
+              const isPast = currentStep > s.number;
+              const isCurrent = currentStep === s.number;
+
+              return (
+                <button
+                  key={s.number}
+                  type="button"
+                  onClick={() => onStepClick(s.number)}
+                  className="flex flex-col gap-1 py-1 text-left focus:outline-none"
+                  aria-label={`Go to step ${s.number}: ${s.title}`}
+                >
+                  <div
+                    className={`h-1.5 rounded-full transition-all duration-300 ${
+                      isPast
+                        ? 'bg-blue-700'
+                        : isCurrent
+                        ? 'bg-blue-600'
+                        : 'bg-slate-200'
+                    }`}
+                  />
+                  <span
+                    className={`text-[10px] font-bold truncate ${
+                      isCurrent ? 'text-blue-900' : 'text-slate-400'
+                    }`}
+                  >
+                    {s.number}. {s.mobileTitle}
+                  </span>
+                </button>
+              );
+            })}
           </div>
         </div>
 
@@ -74,9 +111,9 @@ export const StepProgressBar: React.FC<StepProgressBarProps> = ({
                 onClick={() => onStepClick(s.number)}
                 className={`flex items-center gap-3 p-2.5 rounded-xl text-left transition-all ${
                   isActive
-                    ? 'bg-blue-50/70 border border-blue-200/90 shadow-2xs'
+                    ? 'bg-blue-50/80 border border-blue-200 shadow-2xs ring-1 ring-blue-700/20'
                     : isCompleted
-                    ? 'bg-slate-50/80 border border-slate-200/60 hover:bg-slate-100'
+                    ? 'bg-slate-50 border border-slate-200/70 hover:bg-slate-100'
                     : 'border border-transparent hover:bg-slate-50'
                 }`}
               >

@@ -3,8 +3,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { jsPDF } from 'jspdf';
-import { toJpeg, toPng } from 'html-to-image';
 import { CoverPageData } from '../types/coverPage';
 import { waitForDocumentFonts, getEmbeddedFontCSS } from './fontUtils';
 
@@ -33,6 +31,20 @@ export function generateFilename(data: CoverPageData, extension: 'pdf' | 'jpg'):
   const components = [code, num, sem, slugTitle].filter(Boolean);
   const base = components.join('_') || 'CoverLagbe_CoverPage';
   return `${base}.${extension}`;
+}
+
+export function isMobileOrConstrained(): boolean {
+  if (typeof window === 'undefined') return false;
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const isCoarse = window.matchMedia('(pointer: coarse)').matches;
+  const navAny = navigator as unknown as { deviceMemory?: number };
+  const isLowMemory = typeof navAny.deviceMemory === 'number' && navAny.deviceMemory < 4;
+  return isIOS || isCoarse || isLowMemory;
+}
+
+export function isIOSDevice(): boolean {
+  if (typeof window === 'undefined') return false;
+  return /iphone|ipad|ipod/i.test(navigator.userAgent);
 }
 
 export interface IsolatedExportContext {
@@ -95,7 +107,6 @@ export async function createIsolatedExportElement(
   const images = Array.from(clone.querySelectorAll('img'));
   await Promise.all(
     images.map(async (img) => {
-      // If not yet loaded, wait for completion
       if (!img.complete) {
         await new Promise((res) => {
           img.onload = res;
@@ -103,7 +114,6 @@ export async function createIsolatedExportElement(
         });
       }
 
-      // If relative or http(s) URL, convert to inline base64 data URL
       if (img.src && !img.src.startsWith('data:')) {
         try {
           const res = await fetch(img.src);
@@ -140,8 +150,8 @@ export async function createIsolatedExportElement(
 }
 
 /**
- * Downloads live element as a high-resolution A4 JPG (approx 2481 x 3509 px, 300 DPI)
- * matches live preview pixel-perfectly without zoom/scaling or font distortion.
+ * Downloads live element as a high-resolution A4 JPG
+ * Matches live preview pixel-perfectly without zoom/scaling or font distortion.
  */
 export async function exportToJpg(
   element: HTMLElement,
@@ -156,8 +166,9 @@ export async function exportToJpg(
   let isolatedContext: IsolatedExportContext | null = null;
 
   try {
-    // 1. Prepare unscaled isolated clone & embedded font CSS in parallel
-    const [context, fontEmbedCSS] = await Promise.all([
+    // Dynamically import html-to-image to keep initial bundle size lean
+    const [{ toJpeg }, context, fontEmbedCSS] = await Promise.all([
+      import('html-to-image'),
       createIsolatedExportElement(element),
       getEmbeddedFontCSS(),
     ]);
@@ -168,10 +179,13 @@ export async function exportToJpg(
       message: 'Rasterizing A4 cover page at high-resolution print quality...',
     });
 
-    // Fallback retry sequence for memory-constrained environments: 3.125 (300 DPI) -> 2.0 -> 1.5
-    const fallbackRatios = [3.125, 2.0, 1.5];
+    // Fallback retry sequence: on mobile/low-memory start at 2.0x to avoid memory crashes
+    const fallbackRatios = isMobileOrConstrained()
+      ? [2.0, 1.5, 1.25]
+      : [3.125, 2.0, 1.5];
+
     let dataUrl: string | null = null;
-    let chosenRatio = 3.125;
+    let chosenRatio = fallbackRatios[0];
     let lastError: unknown = null;
 
     for (const ratio of fallbackRatios) {
@@ -201,7 +215,7 @@ export async function exportToJpg(
         break;
       } catch (err) {
         lastError = err;
-        console.warn(`JPG render at pixelRatio ${ratio} encountered memory or canvas error, trying fallback...`, err);
+        console.warn(`JPG render at pixelRatio ${ratio} encountered memory error, trying fallback...`, err);
       }
     }
 
@@ -215,19 +229,59 @@ export async function exportToJpg(
     });
 
     const filename = generateFilename(data, 'jpg');
-    const link = document.createElement('a');
-    link.href = dataUrl;
-    link.download = filename;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+
+    // Convert data URL to Blob for reliable iOS Safari saving & Web Share API
+    const res = await fetch(dataUrl);
+    const blob = await res.blob();
+    const file = new File([blob], filename, { type: 'image/jpeg' });
+
+    let shared = false;
+    if (
+      typeof navigator !== 'undefined' &&
+      navigator.canShare &&
+      navigator.canShare({ files: [file] })
+    ) {
+      try {
+        await navigator.share({
+          files: [file],
+          title: filename,
+        });
+        shared = true;
+      } catch (err) {
+        if ((err as Error).name !== 'AbortError') {
+          console.warn('Web Share API failed, falling back to download link:', err);
+        } else {
+          // User intentionally cancelled share dialog
+          onProgress?.({
+            status: 'success',
+            message: `Export ready for "${filename}".`,
+          });
+          return;
+        }
+      }
+    }
+
+    if (!shared) {
+      const blobUrl = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      setTimeout(() => {
+        if (link.parentNode) link.parentNode.removeChild(link);
+        URL.revokeObjectURL(blobUrl);
+      }, 2000);
+    }
 
     const qualityLabel =
       chosenRatio === 3.125
         ? '300 DPI Ultra-High'
         : chosenRatio === 2.0
-        ? 'High (2.0x fallback)'
-        : 'Standard (1.5x fallback)';
+        ? 'High (2.0x)'
+        : chosenRatio === 1.5
+        ? 'Standard (1.5x fallback)'
+        : 'Compact (1.25x fallback)';
 
     onProgress?.({
       status: 'success',
@@ -252,7 +306,7 @@ export async function exportToJpg(
 
 /**
  * Downloads live element as a single-page print-ready A4 PDF (210 x 297 mm)
- * matches live preview pixel-perfectly without zoom/scaling or font distortion.
+ * Matches live preview pixel-perfectly without zoom/scaling or font distortion.
  */
 export async function exportToPdf(
   element: HTMLElement,
@@ -267,8 +321,10 @@ export async function exportToPdf(
   let isolatedContext: IsolatedExportContext | null = null;
 
   try {
-    // 1. Prepare unscaled isolated clone & embedded font CSS in parallel
-    const [context, fontEmbedCSS] = await Promise.all([
+    // Dynamically import html-to-image and jspdf to keep initial load fast
+    const [{ toPng }, { jsPDF }, context, fontEmbedCSS] = await Promise.all([
+      import('html-to-image'),
+      import('jspdf'),
       createIsolatedExportElement(element),
       getEmbeddedFontCSS(),
     ]);
@@ -279,10 +335,13 @@ export async function exportToPdf(
       message: 'Generating vector-crisp A4 page for document export...',
     });
 
-    // Fallback retry sequence for PDF rasterization: 2.5 (vector-crisp) -> 2.0 -> 1.5
-    const fallbackRatios = [2.5, 2.0, 1.5];
+    // Fallback retry sequence for PDF rasterization
+    const fallbackRatios = isMobileOrConstrained()
+      ? [2.0, 1.5, 1.25]
+      : [2.5, 2.0, 1.5];
+
     let dataUrl: string | null = null;
-    let chosenRatio = 2.5;
+    let chosenRatio = fallbackRatios[0];
     let lastError: unknown = null;
 
     for (const ratio of fallbackRatios) {
@@ -311,7 +370,7 @@ export async function exportToPdf(
         break;
       } catch (err) {
         lastError = err;
-        console.warn(`PDF render at pixelRatio ${ratio} encountered memory or canvas error, trying fallback...`, err);
+        console.warn(`PDF render at pixelRatio ${ratio} encountered memory error, trying fallback...`, err);
       }
     }
 
@@ -336,14 +395,45 @@ export async function exportToPdf(
     pdf.addImage(dataUrl, 'PNG', 0, 0, 210, 297, undefined, 'FAST');
 
     const filename = generateFilename(data, 'pdf');
-    pdf.save(filename);
+
+    // On iOS Safari, use Web Share or direct blob window opening
+    if (isIOSDevice()) {
+      try {
+        const pdfBlob = pdf.output('blob');
+        const file = new File([pdfBlob], filename, { type: 'application/pdf' });
+
+        if (
+          typeof navigator !== 'undefined' &&
+          navigator.canShare &&
+          navigator.canShare({ files: [file] })
+        ) {
+          await navigator.share({
+            files: [file],
+            title: filename,
+          });
+        } else {
+          const blobUrl = URL.createObjectURL(pdfBlob);
+          window.open(blobUrl, '_blank');
+          setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
+        }
+      } catch (err) {
+        if ((err as Error).name !== 'AbortError') {
+          console.warn('iOS share failed, trying pdf.save fallback:', err);
+          pdf.save(filename);
+        }
+      }
+    } else {
+      pdf.save(filename);
+    }
 
     const qualityLabel =
       chosenRatio === 2.5
         ? 'Vector-Crisp (2.5x)'
         : chosenRatio === 2.0
-        ? 'High (2.0x fallback)'
-        : 'Standard (1.5x fallback)';
+        ? 'High (2.0x)'
+        : chosenRatio === 1.5
+        ? 'Standard (1.5x fallback)'
+        : 'Compact (1.25x fallback)';
 
     onProgress?.({
       status: 'success',

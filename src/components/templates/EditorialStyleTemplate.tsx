@@ -14,7 +14,7 @@ interface TemplateProps {
   accentColor: AccentColorConfig;
 }
 
-export const EditorialStyleTemplate: React.FC<TemplateProps> = ({
+export const EditorialStyleTemplate = React.memo<TemplateProps>(({
   data,
   logoUrl,
   isLogoConfigured,
@@ -200,4 +200,6 @@ export const EditorialStyleTemplate: React.FC<TemplateProps> = ({
       </div>
     </div>
   );
-};
+});
+
+EditorialStyleTemplate.displayName = 'EditorialStyleTemplate';

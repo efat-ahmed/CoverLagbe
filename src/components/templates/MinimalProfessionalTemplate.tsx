@@ -14,7 +14,7 @@ interface TemplateProps {
   accentColor: AccentColorConfig;
 }
 
-export const MinimalProfessionalTemplate: React.FC<TemplateProps> = ({
+export const MinimalProfessionalTemplate = React.memo<TemplateProps>(({
   data,
   logoUrl,
   isLogoConfigured,
@@ -188,4 +188,6 @@ export const MinimalProfessionalTemplate: React.FC<TemplateProps> = ({
       </div>
     </div>
   );
-};
+});
+
+MinimalProfessionalTemplate.displayName = 'MinimalProfessionalTemplate';

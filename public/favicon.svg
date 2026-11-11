@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <rect width="64" height="64" rx="14" fill="#2A5CAA"/>
+  <!-- Folded sheet shape -->
+  <path d="M18 14h18l12 12v24a4 4 0 0 1-4 4H18a4 4 0 0 1-4-4V18a4 4 0 0 1 4-4z" fill="#ffffff" opacity="0.95"/>
+  <path d="M36 14v12h12" fill="#DBEAFE"/>
+  <!-- Text lines -->
+  <rect x="22" y="32" width="20" height="3" rx="1.5" fill="#2A5CAA"/>
+  <rect x="22" y="39" width="16" height="2.5" rx="1.25" fill="#93C5FD"/>
+  <rect x="22" y="45" width="12" height="2" rx="1" fill="#CBD5E1"/>
+</svg>

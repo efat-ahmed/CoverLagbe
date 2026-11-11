@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { forwardRef } from 'react';
+import React, { forwardRef, useMemo, memo } from 'react';
 import { CoverPageData } from '../../types/coverPage';
 import { ACCENT_COLORS } from '../../config/constants';
 import { ClassicAcademicTemplate } from './ClassicAcademicTemplate';
@@ -24,10 +24,13 @@ interface CoverPageRendererProps {
  * CoverPageRenderer: Single-page A4 portrait document (210 x 297 mm, 794px x 1123px at 96 DPI baseline).
  * All 6 templates receive identical data and configuration.
  */
-export const CoverPageRenderer = forwardRef<HTMLDivElement, CoverPageRendererProps>(
-  ({ data, logoUrl, isLogoConfigured, className = '' }, ref) => {
-    const accentColor =
-      ACCENT_COLORS.find((c) => c.id === data.accentColorId) || ACCENT_COLORS[0];
+export const CoverPageRenderer = memo(
+  forwardRef<HTMLDivElement, CoverPageRendererProps>(
+    ({ data, logoUrl, isLogoConfigured, className = '' }, ref) => {
+      const accentColor = useMemo(
+        () => ACCENT_COLORS.find((c) => c.id === data.accentColorId) || ACCENT_COLORS[0],
+        [data.accentColorId]
+      );
 
     const renderActiveTemplate = () => {
       switch (data.template) {
@@ -115,7 +118,7 @@ export const CoverPageRenderer = forwardRef<HTMLDivElement, CoverPageRendererPro
         {renderActiveTemplate()}
       </div>
     );
-  }
+  })
 );
 
 CoverPageRenderer.displayName = 'CoverPageRenderer';

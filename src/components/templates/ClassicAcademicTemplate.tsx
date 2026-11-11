@@ -14,7 +14,7 @@ interface TemplateProps {
   accentColor: AccentColorConfig;
 }
 
-export const ClassicAcademicTemplate: React.FC<TemplateProps> = ({
+export const ClassicAcademicTemplate = React.memo<TemplateProps>(({
   data,
   logoUrl,
   isLogoConfigured,
@@ -266,4 +266,6 @@ export const ClassicAcademicTemplate: React.FC<TemplateProps> = ({
       </div>
     </div>
   );
-};
+});
+
+ClassicAcademicTemplate.displayName = 'ClassicAcademicTemplate';

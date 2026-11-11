@@ -3,16 +3,21 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useDeferredValue,
+  Suspense,
+  lazy,
+} from 'react';
 import { CoverPageData } from './types/coverPage';
 import { INITIAL_COVER_PAGE_DATA, SAMPLE_PROJECTS } from './config/constants';
 import { Header } from './components/Header';
 import { StepProgressBar, WorkflowStep } from './components/StepProgressBar';
 import { EditorPanel } from './components/EditorPanel';
-import { TemplateGalleryStep } from './components/TemplateGalleryStep';
-import { AdminLogoModal } from './components/AdminLogoModal';
-import { ResetConfirmModal } from './components/ResetConfirmModal';
-import { ExportProgressModal } from './components/ExportProgressModal';
+import { PreviewPanel } from './components/PreviewPanel';
+import { CoverPageRenderer } from './components/templates/CoverPageRenderer';
 import {
   getInstitutionalLogo,
   LOGO_CHANGE_EVENT,
@@ -21,17 +26,34 @@ import {
 import { saveDraft, loadSavedDraft, clearSavedDraft } from './utils/storage';
 import { exportToPdf, exportToJpg, ExportProgress } from './utils/exportUtils';
 import { preloadFontEmbedCSS } from './utils/fontUtils';
-import { CoverPageRenderer } from './components/templates/CoverPageRenderer';
 import { Footer } from './components/Footer';
+import { Eye, X } from 'lucide-react';
+
+// Lazy-loaded secondary steps & modals for minimal initial bundle size
+const TemplateGalleryStep = lazy(() =>
+  import('./components/TemplateGalleryStep').then((m) => ({ default: m.TemplateGalleryStep }))
+);
+const AdminLogoModal = lazy(() =>
+  import('./components/AdminLogoModal').then((m) => ({ default: m.AdminLogoModal }))
+);
+const ResetConfirmModal = lazy(() =>
+  import('./components/ResetConfirmModal').then((m) => ({ default: m.ResetConfirmModal }))
+);
+const ExportProgressModal = lazy(() =>
+  import('./components/ExportProgressModal').then((m) => ({ default: m.ExportProgressModal }))
+);
 
 export default function App() {
-  // main form state
+  // Main form state
   const [coverData, setCoverData] = useState<CoverPageData>(() => {
     const saved = loadSavedDraft();
     return saved.data || INITIAL_COVER_PAGE_DATA;
   });
 
-  // Current workflow step: 1 = University & Course, 2 = Assignment & Students, 3 = Template & Export
+  // Use deferred value for the preview so typing in form inputs never lags
+  const deferredCoverData = useDeferredValue(coverData);
+
+  // Workflow step: 1 = University & Course, 2 = Assignment & Students, 3 = Template & Export
   const [currentStep, setCurrentStep] = useState<WorkflowStep>(1);
 
   // Institutional logo state
@@ -43,15 +65,17 @@ export default function App() {
     return saved.savedAt;
   });
 
-  // Modal states
+  // Modals & Tablet Preview Sheet
   const [isAdminLogoModalOpen, setIsAdminLogoModalOpen] = useState(false);
   const [isResetModalOpen, setIsResetModalOpen] = useState(false);
+  const [isTabletPreviewOpen, setIsTabletPreviewOpen] = useState(false);
   const [exportProgress, setExportProgress] = useState<ExportProgress | null>(null);
 
   // Ref to render target
   const printTargetRef = useRef<HTMLDivElement | null>(null);
+  const lastExportTypeRef = useRef<'pdf' | 'jpg'>('pdf');
 
-  // Listen for institutional logo changes
+  // Listen for institutional logo updates
   useEffect(() => {
     const handleLogoChange = () => {
       setLogoConfig(getInstitutionalLogo());
@@ -107,11 +131,17 @@ export default function App() {
     exportProgress !== null &&
     ['preparing', 'rendering', 'saving'].includes(exportProgress.status);
 
+  // Helper to resolve an export render target
+  const getExportTarget = (): HTMLElement | null => {
+    return printTargetRef.current || document.getElementById('cover-page-render-target');
+  };
+
   // Export handlers
   const handleExportPdf = async () => {
     if (isExporting) return;
+    lastExportTypeRef.current = 'pdf';
 
-    const target = printTargetRef.current || document.getElementById('cover-page-render-target');
+    const target = getExportTarget();
     if (!target) {
       setExportProgress({
         status: 'error',
@@ -131,8 +161,9 @@ export default function App() {
 
   const handleExportJpg = async () => {
     if (isExporting) return;
+    lastExportTypeRef.current = 'jpg';
 
-    const target = printTargetRef.current || document.getElementById('cover-page-render-target');
+    const target = getExportTarget();
     if (!target) {
       setExportProgress({
         status: 'error',
@@ -150,8 +181,16 @@ export default function App() {
     }
   };
 
+  const handleRetryExport = () => {
+    if (lastExportTypeRef.current === 'pdf') {
+      handleExportPdf();
+    } else {
+      handleExportJpg();
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col font-sans text-slate-900 selection:bg-blue-100 selection:text-blue-900">
+    <div className="min-h-dvh flex flex-col font-sans text-slate-900 bg-slate-50 selection:bg-blue-100 selection:text-blue-900">
       {/* App Header */}
       <Header
         onResetClick={() => setIsResetModalOpen(true)}
@@ -171,71 +210,135 @@ export default function App() {
         onStepClick={setCurrentStep}
       />
 
-      {/* Main Workspace */}
-      <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6">
-        {/* Step 1 & Step 2: Information Entry Form (Mobile-First Centered Container) */}
+      {/* Main Workspace: Adaptively sized for Phone, Tablet, Laptop, and Desktop */}
+      <main className="flex-1 max-w-[1600px] w-full mx-auto p-3 sm:p-5 lg:p-6 flex flex-col">
+        {/* Step 1 & 2 Layout:
+            - Phone (<768px): Single-column clean form
+            - Tablet (768-1279px): Centered wider form + "Quick Preview" floating action
+            - Laptop/Desktop (≥1280px / xl): Responsive side-by-side split view with live sticky preview
+        */}
         {currentStep < 3 ? (
-          <div className="max-w-2xl mx-auto w-full">
-            <EditorPanel
-              data={coverData}
-              onChange={setCoverData}
-              onLoadPreset={handleLoadPreset}
-              currentStep={currentStep}
-              onNavigateStep={setCurrentStep}
-            />
+          <div className="flex-1 w-full">
+            {/* Desktop Split View Container */}
+            <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start h-full">
+              {/* Form Column */}
+              <div className="w-full max-w-2xl mx-auto xl:max-w-none xl:col-span-6 2xl:col-span-5 h-full">
+                <EditorPanel
+                  data={coverData}
+                  onChange={setCoverData}
+                  onLoadPreset={handleLoadPreset}
+                  currentStep={currentStep}
+                  onNavigateStep={setCurrentStep}
+                />
+              </div>
 
-            {/* Offscreen Target for Export Pre-caching when on step 1 or 2 */}
-            <div
-              className="no-print"
-              style={{ position: 'fixed', left: '-99999px', top: '0', pointerEvents: 'none', opacity: 0 }}
-              aria-hidden="true"
-            >
-              <CoverPageRenderer
-                ref={printTargetRef}
-                data={coverData}
-                logoUrl={logoConfig.url}
-                isLogoConfigured={logoConfig.isConfigured}
-              />
+              {/* Desktop Sticky Live A4 Preview (Always visible on ≥1280px while editing) */}
+              <div className="hidden xl:block xl:col-span-6 2xl:col-span-7 sticky top-20 h-[calc(100dvh-6rem)] max-h-[920px]">
+                <PreviewPanel
+                  data={deferredCoverData}
+                  logoUrl={logoConfig.url}
+                  isLogoConfigured={logoConfig.isConfigured}
+                  printTargetRef={printTargetRef}
+                  compactToolbar
+                />
+              </div>
             </div>
+
+            {/* Tablet Quick Preview Floating Trigger (768px to 1279px) */}
+            <div className="hidden md:block xl:hidden fixed bottom-6 right-6 z-30">
+              <button
+                type="button"
+                onClick={() => setIsTabletPreviewOpen(true)}
+                className="flex items-center gap-2 px-4 py-3 bg-blue-700 hover:bg-blue-800 text-white rounded-2xl shadow-xl font-bold text-xs transition-transform hover:scale-105 active:scale-95"
+              >
+                <Eye className="w-4 h-4" />
+                <span>Live A4 Preview</span>
+              </button>
+            </div>
+
+            {/* Tablet Preview Modal Sheet */}
+            {isTabletPreviewOpen && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-150">
+                <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-3xl h-[85vh] flex flex-col overflow-hidden">
+                  <div className="p-3.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+                    <span className="text-sm font-bold text-slate-800 flex items-center gap-2">
+                      <Eye className="w-4 h-4 text-blue-700" />
+                      Live Document Preview
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setIsTabletPreviewOpen(false)}
+                      className="p-1.5 text-slate-500 hover:text-slate-800 rounded-lg hover:bg-slate-200 transition-colors"
+                      aria-label="Close preview"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                  <div className="flex-1 overflow-hidden p-2">
+                    <PreviewPanel
+                      data={deferredCoverData}
+                      logoUrl={logoConfig.url}
+                      isLogoConfigured={logoConfig.isConfigured}
+                      printTargetRef={printTargetRef}
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         ) : (
           /* Step 3: Template Selection & Export (The Grand Finale) */
-          <TemplateGalleryStep
-            data={coverData}
-            onChange={setCoverData}
-            logoUrl={logoConfig.url}
-            isLogoConfigured={logoConfig.isConfigured}
-            onExportPdf={handleExportPdf}
-            onExportJpg={handleExportJpg}
-            isExporting={isExporting}
-            printTargetRef={printTargetRef}
-            onNavigateStep={setCurrentStep}
-          />
+          <Suspense
+            fallback={
+              <div className="flex items-center justify-center min-h-[400px] text-slate-400 text-sm">
+                Loading Template Studio...
+              </div>
+            }
+          >
+            <TemplateGalleryStep
+              data={deferredCoverData}
+              onChange={setCoverData}
+              logoUrl={logoConfig.url}
+              isLogoConfigured={logoConfig.isConfigured}
+              onExportPdf={handleExportPdf}
+              onExportJpg={handleExportJpg}
+              isExporting={isExporting}
+              printTargetRef={printTargetRef}
+              onNavigateStep={setCurrentStep}
+            />
+          </Suspense>
         )}
       </main>
- 
-      {/* Footer (appears at the very bottom when scrolled, not sticky) */}
+
+      {/* Footer */}
       <Footer />
 
-      {/* Institutional Logo Configuration Modal (Admin Setup) */}
-      <AdminLogoModal
-        isOpen={isAdminLogoModalOpen}
-        onClose={() => setIsAdminLogoModalOpen(false)}
-        onLogoUpdated={() => setLogoConfig(getInstitutionalLogo())}
-      />
+      {/* Lazy Modals with Suspense */}
+      <Suspense fallback={null}>
+        {isAdminLogoModalOpen && (
+          <AdminLogoModal
+            isOpen={isAdminLogoModalOpen}
+            onClose={() => setIsAdminLogoModalOpen(false)}
+            onLogoUpdated={() => setLogoConfig(getInstitutionalLogo())}
+          />
+        )}
 
-      {/* Reset Confirmation Modal */}
-      <ResetConfirmModal
-        isOpen={isResetModalOpen}
-        onClose={() => setIsResetModalOpen(false)}
-        onConfirm={handleResetForm}
-      />
+        {isResetModalOpen && (
+          <ResetConfirmModal
+            isOpen={isResetModalOpen}
+            onClose={() => setIsResetModalOpen(false)}
+            onConfirm={handleResetForm}
+          />
+        )}
 
-      {/* Export Progress Modal */}
-      <ExportProgressModal
-        progress={exportProgress}
-        onClose={() => setExportProgress(null)}
-      />
+        {exportProgress && (
+          <ExportProgressModal
+            progress={exportProgress}
+            onClose={() => setExportProgress(null)}
+            onRetry={handleRetryExport}
+          />
+        )}
+      </Suspense>
     </div>
   );
 }

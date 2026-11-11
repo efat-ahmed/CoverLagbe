@@ -14,7 +14,7 @@ interface TemplateProps {
   accentColor: AccentColorConfig;
 }
 
-export const PremiumFormalTemplate: React.FC<TemplateProps> = ({
+export const PremiumFormalTemplate = React.memo<TemplateProps>(({
   data,
   logoUrl,
   isLogoConfigured,
@@ -210,4 +210,6 @@ export const PremiumFormalTemplate: React.FC<TemplateProps> = ({
       </div>
     </div>
   );
-};
+});
+
+PremiumFormalTemplate.displayName = 'PremiumFormalTemplate';
