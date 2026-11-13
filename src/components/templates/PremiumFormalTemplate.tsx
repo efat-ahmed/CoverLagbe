@@ -5,6 +5,7 @@
 
 import React from 'react';
 import { CoverPageData, AccentColorConfig } from '../../types/coverPage';
+import { TYPE_SCALE } from '../../config/constants';
 import { UniversityLogo } from './UniversityLogo';
 
 interface TemplateProps {
@@ -35,15 +36,15 @@ export const PremiumFormalTemplate = React.memo<TemplateProps>(({
     <div className="relative w-full h-full bg-white text-slate-900 flex flex-col justify-between overflow-hidden select-none">
       {/* TOP EXECUTIVE ACCENT HEADER BAND */}
       <div
-        className={`shrink-0 w-full ${isCompact ? 'px-8 py-3.5' : 'px-10 py-5'} text-white flex items-center justify-between gap-6`}
+        className={`shrink-0 w-full ${isCompact ? 'px-10 py-4' : 'px-12 py-6'} text-white flex items-center justify-between gap-6`}
         style={{ backgroundColor: accentColor.primary }}
       >
         <div className="min-w-0 flex-1 space-y-1">
-          <h1 className="text-[12px] font-bold tracking-[0.18em] uppercase text-white/95 leading-snug break-words">
+          <h1 className={`${isCompact ? TYPE_SCALE.universityHeaderCompact : TYPE_SCALE.universityHeader} font-bold tracking-[0.14em] uppercase text-white/95 break-words`}>
             {data.universityName || 'BRAC UNIVERSITY'}
           </h1>
           {visibility.showDepartment && data.departmentName?.trim() && (
-            <p className="text-xs text-white/85 font-normal tracking-wide leading-normal break-words">
+            <p className={`${isCompact ? TYPE_SCALE.departmentHeaderCompact : TYPE_SCALE.departmentHeader} text-white/90 font-normal tracking-wide break-words`}>
               {data.departmentName}
             </p>
           )}
@@ -62,14 +63,14 @@ export const PremiumFormalTemplate = React.memo<TemplateProps>(({
       </div>
 
       {/* MAIN BODY AREA */}
-      <div className={`flex-1 w-full min-h-0 ${isCompact ? 'px-8 py-2' : 'px-10 py-5'} flex flex-col justify-between`}>
+      <div className={`flex-1 w-full min-h-0 ${isCompact ? 'px-10 py-4' : 'px-12 py-6'} flex flex-col justify-between`}>
         {/* Document Classification & Title Block */}
-        <div className={`${isCompact ? 'my-1 py-1' : 'my-auto py-2'}`}>
+        <div className={`${isCompact ? 'my-1 py-1' : 'my-auto py-2'} min-w-0`}>
           {/* Classification Tags */}
-          <div className="flex items-center flex-wrap gap-2 mb-2">
+          <div className={`flex items-center flex-wrap gap-2.5 ${isCompact ? 'mb-2.5' : 'mb-3.5'} ${isCompact ? TYPE_SCALE.metaTagCompact : TYPE_SCALE.metaTag}`}>
             {visibility.showAssignmentNo && data.assignmentNumber?.trim() && (
               <span
-                className="px-2.5 py-0.5 rounded font-mono-code font-bold text-xs uppercase"
+                className={`px-3 py-0.5 rounded font-mono-code font-bold ${isCompact ? TYPE_SCALE.metaTagCompact : TYPE_SCALE.metaTag} uppercase`}
                 style={{
                   backgroundColor: accentColor.tint,
                   color: accentColor.primary,
@@ -80,12 +81,12 @@ export const PremiumFormalTemplate = React.memo<TemplateProps>(({
               </span>
             )}
             {visibility.showCourseCode && data.courseCode?.trim() && (
-              <span className="font-mono-code text-xs font-semibold text-slate-600">
+              <span className={`font-mono-code ${isCompact ? TYPE_SCALE.metaTagCompact : TYPE_SCALE.metaTag} font-semibold text-slate-700`}>
                 [{data.courseCode}]
               </span>
             )}
             {visibility.showSemester && data.semester?.trim() && (
-              <span className="text-xs font-bold text-slate-700">
+              <span className={`${isCompact ? TYPE_SCALE.metaTagCompact : TYPE_SCALE.metaTag} font-bold text-slate-800`}>
                 · Semester: {data.semester}
               </span>
             )}
@@ -93,51 +94,51 @@ export const PremiumFormalTemplate = React.memo<TemplateProps>(({
 
           {/* Assignment Title */}
           <h2
-            className={`${fontClass} ${isCompact ? 'text-[22px] leading-snug' : 'text-[26px] leading-[1.3]'} font-extrabold text-slate-950 tracking-tight text-balance break-words`}
+            className={`${fontClass} ${isCompact ? TYPE_SCALE.assignmentTitleTightCompact : TYPE_SCALE.assignmentTitleTight} font-extrabold text-slate-950 tracking-tight text-balance break-words`}
           >
             {data.assignmentTitle || 'Assignment Report Title'}
           </h2>
 
           {data.courseTitle?.trim() && (
-            <p className={`text-sm font-semibold text-slate-600 ${isCompact ? 'mt-1' : 'mt-2'} tracking-wide font-sans-modern`}>
+            <p className={`${isCompact ? TYPE_SCALE.courseTitleCompact : TYPE_SCALE.courseTitle} font-semibold text-slate-600 ${isCompact ? 'mt-2' : 'mt-3'} tracking-wide font-sans-modern break-words`}>
               Course: {data.courseTitle}
             </p>
           )}
 
-          <div className={`w-16 ${isCompact ? 'h-0.5 mt-2' : 'h-1 mt-4'}`} style={{ backgroundColor: accentColor.primary }} />
+          <div className={`w-16 ${isCompact ? 'h-0.5 mt-3' : 'h-1 mt-4'}`} style={{ backgroundColor: accentColor.primary }} />
         </div>
 
         {/* STRUCTURED TABULAR STUDENTS & FACULTY SECTION */}
-        <div className={`shrink-0 ${isCompact ? 'space-y-2 pt-1' : 'space-y-4 pt-3'}`}>
+        <div className={`shrink-0 ${isCompact ? 'space-y-3 pt-1' : 'space-y-4 pt-3'}`}>
           {/* Students Table */}
           <div className="border border-slate-200 rounded-lg overflow-hidden">
             <div
-              className={`${isCompact ? 'px-3 py-1.5 text-[11px]' : 'px-4 py-2 text-[12px]'} font-bold uppercase tracking-wider flex items-center justify-between`}
+              className={`${isCompact ? `px-3.5 py-1.5 ${TYPE_SCALE.sectionLabelCompact}` : `px-4 py-2 ${TYPE_SCALE.sectionLabel}`} font-bold uppercase tracking-wider flex items-center justify-between`}
               style={{ backgroundColor: accentColor.tint, color: accentColor.primary }}
             >
               <span>Prepared By Student(s)</span>
               <span>{data.students.length} Contributor{data.students.length > 1 ? 's' : ''}</span>
             </div>
 
-            <table className="w-full text-left border-collapse">
+            <table className="w-full table-fixed text-left border-collapse">
               <thead>
-                <tr className={`border-b border-slate-200 bg-slate-50/60 ${isCompact ? 'text-[11px]' : 'text-[12px]'} text-slate-600 font-semibold uppercase`}>
-                  <th className={`${isCompact ? 'py-1 px-3' : 'py-2 px-4'}`}>Student Name</th>
-                  <th className={`${isCompact ? 'py-1 px-2.5' : 'py-2 px-3'}`}>Student ID</th>
-                  {visibility.showSection && <th className={`${isCompact ? 'py-1 px-2.5' : 'py-2 px-3'}`}>Section</th>}
+                <tr className={`border-b border-slate-200 bg-slate-50/60 ${TYPE_SCALE.eyebrow} text-slate-600 font-bold uppercase`}>
+                  <th className={`${isCompact ? 'py-1.5 px-3.5' : 'py-2 px-4'} w-[52%]`}>Student Name</th>
+                  <th className={`${isCompact ? 'py-1.5 px-2.5' : 'py-2 px-3'} w-[30%]`}>Student ID</th>
+                  {visibility.showSection && <th className={`${isCompact ? 'py-1.5 px-2.5' : 'py-2 px-3'} w-[18%]`}>Section</th>}
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {data.students.map((student, idx) => (
                   <tr key={student.id || idx} className="hover:bg-slate-50/40">
-                    <td className={`${isCompact ? 'py-1 px-3 text-[12.5px]' : 'py-2.5 px-4 text-[14.5px]'} font-bold text-slate-900 leading-tight`}>
+                    <td className={`${isCompact ? `py-1.5 px-3.5 ${TYPE_SCALE.personNameCompact}` : `py-2.5 px-4 ${TYPE_SCALE.personName}`} font-bold text-slate-900 break-words`}>
                       {student.name?.trim() || '—'}
                     </td>
-                    <td className={`${isCompact ? 'py-1 px-2.5 text-[11.5px]' : 'py-2.5 px-3 text-[13px]'} font-mono-code tabular-nums text-slate-800 font-semibold leading-tight`}>
+                    <td className={`${isCompact ? `py-1.5 px-2.5 ${TYPE_SCALE.personDetailCompact}` : `py-2.5 px-3 ${TYPE_SCALE.personDetail}`} font-mono-code tabular-nums text-slate-800 font-semibold break-words`}>
                       {student.studentId?.trim() || '—'}
                     </td>
                     {visibility.showSection && (
-                      <td className={`${isCompact ? 'py-1 px-2.5 text-[11.5px]' : 'py-2.5 px-3 text-[13px]'} text-slate-700 leading-tight`}>
+                      <td className={`${isCompact ? `py-1.5 px-2.5 ${TYPE_SCALE.personDetailCompact}` : `py-2.5 px-3 ${TYPE_SCALE.personDetail}`} text-slate-700 break-words`}>
                         {student.section?.trim() || '—'}
                       </td>
                     )}
@@ -150,47 +151,51 @@ export const PremiumFormalTemplate = React.memo<TemplateProps>(({
           {/* Faculty / Submitted To & Custom Specs Grid */}
           <div className="grid grid-cols-2 gap-4">
             {/* Faculty block */}
-            <div className={`${isCompact ? 'p-2.5' : 'p-3.5'} rounded-lg border border-slate-200 bg-slate-50/50`}>
+            <div className={`${isCompact ? 'p-3' : 'p-4'} rounded-lg border border-slate-200 bg-slate-50/50 min-w-0`}>
               <p
-                className={`text-[12px] font-bold uppercase tracking-wider ${isCompact ? 'mb-0.5' : 'mb-1'} font-sans-modern`}
+                className={`${isCompact ? TYPE_SCALE.sectionLabelCompact : TYPE_SCALE.sectionLabel} font-bold uppercase tracking-wider ${isCompact ? 'mb-1' : 'mb-1.5'} font-sans-modern`}
                 style={{ color: accentColor.primary }}
               >
                 Prepared For
               </p>
-              <p className={`font-bold text-slate-900 ${isCompact ? 'text-[13px] leading-tight' : 'text-[14.5px]'}`}>
+              <p className={`font-bold text-slate-900 break-words ${isCompact ? TYPE_SCALE.personNameCompact : TYPE_SCALE.personName}`}>
                 {data.teacherName?.trim() || 'Faculty Name'}
               </p>
               {visibility.showTeacherDesignation && data.teacherDesignation?.trim() && (
-                <p className={`text-slate-700 ${isCompact ? 'text-[11.5px] leading-tight' : 'text-[13px]'}`}>{data.teacherDesignation}</p>
+                <p className={`text-slate-700 break-words ${isCompact ? TYPE_SCALE.personDetailCompact : TYPE_SCALE.personDetail} mt-0.5`}>
+                  {data.teacherDesignation}
+                </p>
               )}
               {visibility.showDepartment && data.departmentName?.trim() && (
-                <p className={`text-slate-500 ${isCompact ? 'text-[11px] leading-tight' : 'text-[12px]'} mt-0.5`}>{data.departmentName}</p>
+                <p className={`text-slate-500 break-words ${isCompact ? TYPE_SCALE.personSubDetailCompact : TYPE_SCALE.personSubDetail} mt-1`}>
+                  {data.departmentName}
+                </p>
               )}
             </div>
 
             {/* Custom parameters block */}
-            <div className={`${isCompact ? 'p-2.5' : 'p-3.5'} rounded-lg border border-slate-200 bg-slate-50/50 flex flex-col justify-between`}>
+            <div className={`${isCompact ? 'p-3' : 'p-4'} rounded-lg border border-slate-200 bg-slate-50/50 flex flex-col justify-between min-w-0`}>
               <p
-                className={`text-[10px] font-bold uppercase tracking-wider ${isCompact ? 'mb-0.5' : 'mb-1'} font-sans-modern`}
+                className={`${isCompact ? TYPE_SCALE.sectionLabelCompact : TYPE_SCALE.sectionLabel} font-bold uppercase tracking-wider ${isCompact ? 'mb-1' : 'mb-1.5'} font-sans-modern`}
                 style={{ color: accentColor.primary }}
               >
                 Submission Details
               </p>
               {visibility.showDate && data.submissionDate?.trim() && (
-                <div className="text-xs text-slate-700">
-                  <span className="text-slate-400 text-[11px]">Date: </span>
-                  <span className="font-semibold">{data.submissionDate}</span>
+                <div className={`${isCompact ? TYPE_SCALE.footerMetaCompact : TYPE_SCALE.footerMeta} text-slate-700`}>
+                  <span className="text-slate-500">Date: </span>
+                  <span className="font-semibold text-slate-900">{data.submissionDate}</span>
                 </div>
               )}
               {visibility.showCustomFields && data.customFields && data.customFields.length > 0 && (
-                <div className="space-y-1 mt-1 text-[11px]">
+                <div className={`space-y-1 mt-1.5 ${isCompact ? TYPE_SCALE.footerMetaCompact : TYPE_SCALE.footerMeta}`}>
                   {data.customFields
                     .filter((cf) => cf.label?.trim() && cf.value?.trim())
                     .slice(0, 2)
                     .map((cf) => (
-                      <div key={cf.id} className="flex items-center justify-between">
-                        <span className="text-slate-500">{cf.label}:</span>
-                        <span className="font-mono-code font-semibold text-slate-800">{cf.value}</span>
+                      <div key={cf.id} className="flex items-center justify-between gap-2 min-w-0">
+                        <span className="text-slate-500 truncate">{cf.label}:</span>
+                        <span className="font-mono-code font-semibold text-slate-800 break-words text-right">{cf.value}</span>
                       </div>
                     ))}
                 </div>
@@ -201,7 +206,7 @@ export const PremiumFormalTemplate = React.memo<TemplateProps>(({
       </div>
 
       {/* EXECUTIVE FOOTER BAR */}
-      <div className={`shrink-0 w-full ${isCompact ? 'px-8 py-2' : 'px-10 py-2.5'} bg-slate-100 border-t border-slate-200 flex items-center justify-between text-[10px] text-slate-500 font-sans-modern`}>
+      <div className={`shrink-0 w-full ${isCompact ? 'px-10 py-2.5' : 'px-12 py-3'} bg-slate-100 border-t border-slate-200 flex items-center justify-between ${isCompact ? TYPE_SCALE.footerMetaCompact : TYPE_SCALE.footerMeta} text-slate-600 font-sans-modern`}>
         <span>Official Academic Coursework Document</span>
         <span>Faculty Evaluation Copy</span>
         {visibility.showDate && data.submissionDate?.trim() && (

@@ -67,6 +67,57 @@ export function getDynamicSemesterExamples(count = 4, startDate = new Date()): s
 
 export const SEMESTER_EXAMPLES = getDynamicSemesterExamples();
 
+/**
+ * Unified A4 (794x1123 px) typography scale shared across all 6 cover page templates.
+ * Ensures printed readability, proper visual hierarchy, and strict >= 13px minimum floor.
+ */
+export const TYPE_SCALE = {
+  // University name: 20-28px
+  universityHero: 'text-[26px] leading-[1.25]',
+  universityHeroCompact: 'text-[22px] leading-[1.25]',
+  universityHeader: 'text-[22px] leading-[1.25]',
+  universityHeaderCompact: 'text-[20px] leading-[1.25]',
+
+  // Department name in header: 14-15px
+  departmentHeader: 'text-[15px] leading-[1.35]',
+  departmentHeaderCompact: 'text-[14px] leading-[1.3]',
+
+  // Assignment title (dominant element): 32-36px normal, 26-28px compact
+  assignmentTitle: 'text-[34px] leading-[1.22]',
+  assignmentTitleCompact: 'text-[27px] leading-[1.22]',
+  assignmentTitleTight: 'text-[32px] leading-[1.22]',
+  assignmentTitleTightCompact: 'text-[26px] leading-[1.22]',
+
+  // Course title / code / semester tags: 14-16px
+  courseTitle: 'text-[16px] leading-[1.35]',
+  courseTitleCompact: 'text-[14.5px] leading-[1.3]',
+  metaTag: 'text-[14.5px] leading-[1.3]',
+  metaTagCompact: 'text-[14px] leading-[1.25]',
+
+  // Section labels (Submitted By / Submitted To): 15-16px
+  sectionLabel: 'text-[15.5px] leading-[1.3]',
+  sectionLabelCompact: 'text-[15px] leading-[1.25]',
+
+  // Student and teacher name: 16-17.5px bold
+  personName: 'text-[17px] leading-[1.3]',
+  personNameCompact: 'text-[16px] leading-[1.25]',
+
+  // Student ID, section, designation: 14.5-16px
+  personDetail: 'text-[15px] leading-[1.35]',
+  personDetailCompact: 'text-[14.5px] leading-[1.25]',
+
+  // Secondary department repeat under faculty: >= 13px minimum
+  personSubDetail: 'text-[13.5px] leading-[1.3]',
+  personSubDetailCompact: 'text-[13px] leading-[1.25]',
+
+  // Date, custom fields, footer: 13.5-14px
+  footerMeta: 'text-[14px] leading-[1.35]',
+  footerMetaCompact: 'text-[13.5px] leading-[1.3]',
+
+  // Absolute minimum text anywhere (eyebrows, table headers): 13px
+  eyebrow: 'text-[13px] leading-[1.3]',
+} as const;
+
 export const TEMPLATE_METADATA: {
   id: TemplateId;
   name: string;
